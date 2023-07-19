@@ -94,14 +94,12 @@ namespace RecommenderSystem
         //max stable k = 20
         public List<(int, double, double)> GetTopKItems(int k, int user, int item)
         {
-            int convertedUser = user - 1;
-            int convertedItem = item - 1;
             //List<double> result = new List<double>();
             List<(int, double, double)> userItemsWithRatings = new List<(int, double, double)>();
 
-            for (int i = 0; i < _itemUserMatrixByRow[convertedUser].Count; i++)
+            for (int i = 0; i < _itemUserMatrixByRow[user].Count; i++)
             {
-                userItemsWithRatings.Add((_itemUserMatrixByRow[convertedUser][i].Item1, _itemItemMatrix[convertedItem][_itemUserMatrixByRow[convertedUser][i].Item1], _itemUserMatrixByRow[convertedUser][i].Item2));
+                userItemsWithRatings.Add((_itemUserMatrixByRow[user][i].Item1, _itemItemMatrix[item][_itemUserMatrixByRow[user][i].Item1], _itemUserMatrixByRow[user][i].Item2));
             }
             //
             userItemsWithRatings.Sort((a, b) => b.Item2.CompareTo(a.Item2));
@@ -111,15 +109,45 @@ namespace RecommenderSystem
            
         }
 
+        public double GetUserMean(int user)
+        {
+            double sum = 0;
+            for (int i= 0; i< _itemUserMatrixByRow[user].Count; i++)
+            {
+                sum += _itemUserMatrixByRow[user][i].Item2;
+            }
+            return sum / (double)_itemUserMatrixByRow[user].Count;
+        }
+
         // max stable k = 19
         public double GetPredictedRatingFromUserToItem(int user, int item, int k, bool useNormalization) 
         {
-            List<(int, double, double)> userItemsWithRatings = GetTopKItems(k + 1, user, item);
+            int convertedUser = user - 1;
+            int convertedItem = item - 1;
+            List<(int, double, double)> userItemsWithRatings = GetTopKItems(k + 1, convertedUser, convertedItem);
             double weightsMultRatingSum = 0;
             double weightsAbsoluteSum = 0;
+            double userMean = GetUserMean(convertedUser);
+
             for (int i = 0; i < k; i++)
             {
-                weightsMultRatingSum += 
+                if (useNormalization)
+                {
+                    weightsMultRatingSum += userItemsWithRatings[i].Item2 * (userItemsWithRatings[i].Item3 - userMean);
+                }
+                else
+                {
+                    weightsMultRatingSum += userItemsWithRatings[i].Item2 * userItemsWithRatings[i].Item3;
+                }
+                weightsAbsoluteSum += Math.Abs(userItemsWithRatings[i].Item2);
+            }
+            if (useNormalization)
+            {
+                return userMean * (weightsMultRatingSum / weightsAbsoluteSum);
+            }
+            else
+            {
+                return weightsMultRatingSum / weightsAbsoluteSum;
             }
         }
 
