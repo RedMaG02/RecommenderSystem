@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -129,6 +130,11 @@ namespace RecommenderSystem
             double weightsAbsoluteSum = 0;
             double userMean = GetUserMean(convertedUser);
 
+            if (userItemsWithRatings.Count < k)
+            {
+                return -100;
+            }
+
             for (int i = 0; i < k; i++)
             {
                 if (useNormalization)
@@ -143,11 +149,22 @@ namespace RecommenderSystem
             }
             if (useNormalization)
             {
-                return userMean * (weightsMultRatingSum / weightsAbsoluteSum);
+                if (!double.IsNaN(userMean + (weightsMultRatingSum / weightsAbsoluteSum)))
+                {
+                    return userMean + (weightsMultRatingSum / weightsAbsoluteSum);
+                }
+                else
+                {
+                    return -100;
+                }
             }
             else
             {
-                return weightsMultRatingSum / weightsAbsoluteSum;
+                if (!double.IsNaN(weightsMultRatingSum / weightsAbsoluteSum))
+                {
+                    return weightsMultRatingSum / weightsAbsoluteSum;
+                }
+                else { return -100; }
             }
         }
 
@@ -183,9 +200,55 @@ namespace RecommenderSystem
             }
             sw.Close ();
         }
-
-
-
+        public double MAE(List<(int, int, double)> testValues, int k, bool useNormalization)
+        {
+            double sumError = 0;
+            int none = 0;
+            for (int i = 0; i < testValues.Count; i++)
+            {
+                double rating = GetPredictedRatingFromUserToItem(testValues[i].Item1, testValues[i].Item2, k, useNormalization);
+                if (rating != -100)
+                {
+                    sumError += Math.Abs(rating - testValues[i].Item3);
+                }
+                else
+                {
+                    none++;
+                }
+            }
+            return sumError/(testValues.Count() - none);
+        }
+        public double RMSE(List<(int, int, double)> testValues, int k, bool useNormalization)
+        {
+            double sumError = 0;
+            int none = 0;
+            for (int i = 0; i < testValues.Count; i++)
+            {
+                double rating = GetPredictedRatingFromUserToItem(testValues[i].Item1, testValues[i].Item2, k, useNormalization);
+                if (rating != -100)
+                {
+                    sumError += Math.Pow(rating - testValues[i].Item3, 2);
+                }
+                else
+                {
+                    none++;
+                }
+                
+            }
+            return Math.Sqrt(sumError / (testValues.Count() - none));
+        }
+        public List<(int, int, double)> GetTestData(string filePath) 
+        {
+            StreamReader streamReader = new StreamReader(filePath);
+            List<(int, int, double)> result = new();
+            string line;
+            while ((line = streamReader.ReadLine()) != null)
+            {
+                string[] stringValues = line.Split(';');
+                result.Add((Convert.ToInt32(stringValues[0]), Convert.ToInt32(stringValues[1]), Convert.ToDouble(stringValues[2])));
+            }
+            return result;
+        }
         public void CteateItemItemSimilarityMatrix()
         {
             List<double> columnMeans = new List<double>();
@@ -209,7 +272,7 @@ namespace RecommenderSystem
             }
 
 
-            PrintVector(columnMeans, @"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\MeanVector.csv");
+            //PrintVector(columnMeans, @"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\MeanVector.csv");
 
 
 
@@ -231,6 +294,64 @@ namespace RecommenderSystem
                                 ijMultSum += ((_itemUserMatrixByColumn[i][k].Item2 - columnMeans[i]) * (_itemUserMatrixByColumn[j][c].Item2 - columnMeans[j]));
                                 iValuesSquareSum += Math.Pow(_itemUserMatrixByColumn[i][k].Item2 - columnMeans[i], 2);
                                 jValuesSquareSum += Math.Pow(_itemUserMatrixByColumn[j][c].Item2 - columnMeans[j], 2);
+                            }
+
+                        }
+                    }
+                    _itemItemMatrix[i][j] = (double)(ijMultSum / (Math.Sqrt(iValuesSquareSum * jValuesSquareSum)));
+                    if (double.IsNaN(_itemItemMatrix[i][j]))
+                    {
+                        _itemItemMatrix[i][j] = 0;
+                    }
+                }
+            }
+        }
+
+        public void CteateItemItemSimilarityMatrixAC()
+        {
+            List<double> rowMeans = new List<double>();
+
+            for (int i = 0; i < _itemUserMatrixByRow.Count; i++)
+            {
+                double sum = 0;
+                if (_itemUserMatrixByRow[i].Count() == 0)
+                {
+                    rowMeans.Add(sum);
+                }
+                else
+                {
+                    for (int j = 0; j < _itemUserMatrixByRow[i].Count(); j++)
+                    {
+                        sum += _itemUserMatrixByRow[i][j].Item2;
+                        //sum += _itemUserMatrixByRow[j][i].Item2;
+                    }
+                    rowMeans.Add((double)(sum / _itemUserMatrixByRow[i].Count()));
+                }
+            }
+
+
+            //PrintVector(rowMeans, @"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\MeanVector.csv");
+
+
+
+            for (int i = 0; i < _itemUserMatrixByColumn.Count(); i++)
+            {
+                _itemItemMatrix.Add(new List<double>());
+                for (int j = 0; j < _itemUserMatrixByColumn.Count(); j++)
+                {
+                    _itemItemMatrix[i].Add(new double());
+                    double ijMultSum = 0;
+                    double iValuesSquareSum = 0, jValuesSquareSum = 0;
+
+                    for (int k = 0; k < _itemUserMatrixByColumn[i].Count; k++)
+                    {
+                        for (int c = 0; c < _itemUserMatrixByColumn[j].Count; c++)
+                        {
+                            if (_itemUserMatrixByColumn[i][k].Item1 == _itemUserMatrixByColumn[j][c].Item1)
+                            {
+                                ijMultSum += ((_itemUserMatrixByColumn[i][k].Item2 - rowMeans[_itemUserMatrixByColumn[i][k].Item1]) * (_itemUserMatrixByColumn[j][c].Item2 - rowMeans[_itemUserMatrixByColumn[j][c].Item1]));
+                                iValuesSquareSum += Math.Pow(_itemUserMatrixByColumn[i][k].Item2 - rowMeans[_itemUserMatrixByColumn[i][k].Item1], 2);
+                                jValuesSquareSum += Math.Pow(_itemUserMatrixByColumn[j][c].Item2 - rowMeans[_itemUserMatrixByColumn[i][k].Item1], 2);
                             }
 
                         }
