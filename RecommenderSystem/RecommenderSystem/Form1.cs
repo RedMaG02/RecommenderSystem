@@ -76,7 +76,7 @@ namespace RecommenderSystem
 
         private void button4_Click(object sender, EventArgs e)
         {
-            rs = new(@"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\trainData.csv");
+            rs = new(trainDataPath);
             rs.CreateItemUserColumnMatrix();
             rs.CreateItemUserRowMatrix();
             if (checkBox2.Checked)

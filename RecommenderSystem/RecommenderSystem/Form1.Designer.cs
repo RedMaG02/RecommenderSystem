@@ -156,9 +156,9 @@
             checkBox2.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
             checkBox2.Location = new Point(12, 325);
             checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(119, 23);
+            checkBox2.Size = new Size(110, 23);
             checkBox2.TabIndex = 10;
-            checkBox2.Text = "Продуктов";
+            checkBox2.Text = "Объектов";
             checkBox2.UseVisualStyleBackColor = true;
             checkBox2.CheckedChanged += checkBox2_CheckedChanged;
             // 

@@ -271,10 +271,7 @@ namespace RecommenderSystem
                 }
             }
 
-
             //PrintVector(columnMeans, @"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\MeanVector.csv");
-
-
 
             for (int i = 0; i< _itemUserMatrixByColumn.Count(); i++)
             {
