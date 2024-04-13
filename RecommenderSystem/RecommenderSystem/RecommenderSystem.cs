@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
@@ -16,11 +17,16 @@ namespace RecommenderSystem
         public List<List<ValueTuple<int, double>>> _itemUserMatrixByRow = new();
         public int _itemUserMatrixRowCount = 0;
         public List<List<double>> _itemItemMatrix = new();
+        public List<List<float>> _itemTagMatrix = new();
         public string _dataPath;
+        public ValueType _valueType;
 
         public RecommenderSystem(string dataPath)
         {
             _dataPath = dataPath;
+        }
+        public RecommenderSystem()
+        {
         }
         public void CreateItemUserMatrix()
         {
@@ -33,6 +39,42 @@ namespace RecommenderSystem
             }
             sr.Close();
         }
+
+        public void CreateItemTagMatrix(string itemTagPath, bool startFrom1 = false)
+        {
+            StreamReader sr = new StreamReader(itemTagPath);
+            int corrector = startFrom1 ? 1 : 0;
+            string line;
+            line = sr.ReadLine();
+            CultureInfo cultureInfo = new("en-US");
+            while ((line = sr.ReadLine()) != null)
+            {
+                string[] stringValues = line.Split(",");
+
+                int movieId = int.Parse(stringValues[0]) - corrector;
+                if (movieId >= _itemTagMatrix.Count )
+                {
+                    int elementsToAdd = movieId - _itemTagMatrix.Count + 1;
+                    for (int i = 0; i < elementsToAdd; i++)
+                    {
+                        _itemTagMatrix.Add(new List<float>());
+                    }
+                }
+
+                int tagId = int.Parse(stringValues[1]) - corrector;
+                if (tagId >= _itemTagMatrix[movieId].Count)
+                {
+                    for (int i = 0; i < tagId - _itemTagMatrix[movieId].Count + 1; i++)
+                    {
+                        _itemTagMatrix[movieId].Add(0);
+                    }
+                }
+                _itemTagMatrix[movieId][tagId] = float.Parse(stringValues[2], NumberStyles.Currency, cultureInfo);
+
+            }
+            sr.Close();
+        }
+
         public void CreateItemUserColumnMatrix()
         {
             StreamReader sr = new StreamReader(_dataPath);
@@ -100,7 +142,7 @@ namespace RecommenderSystem
 
             for (int i = 0; i < _itemUserMatrixByRow[user].Count; i++)
             {
-                userItemsWithRatings.Add((_itemUserMatrixByRow[user][i].Item1, _itemItemMatrix[item][_itemUserMatrixByRow[user][i].Item1], _itemUserMatrixByRow[user][i].Item2));
+                userItemsWithRatings.Add((_itemUserMatrixByRow[user][i].Item1, _itemItemMatrix[item][_itemUserMatrixByRow[user][i].Item1], _itemUserMatrixByRow[user][i].Item2)); 
             }
             //
             userItemsWithRatings.Sort((a, b) => b.Item2.CompareTo(a.Item2));
@@ -132,7 +174,8 @@ namespace RecommenderSystem
 
             if (userItemsWithRatings.Count < k)
             {
-                return -100;
+                k = userItemsWithRatings.Count;
+                //return -100;
             }
 
             for (int i = 0; i < k; i++)
@@ -249,6 +292,47 @@ namespace RecommenderSystem
             }
             return result;
         }
+
+        public void CteateItemItemSimilarityMatrixContentBased()
+        {
+            Random random = new Random();
+
+
+            _itemItemMatrix = new();
+            //for (int i = 0; i < _itemTagMatrix.Count; i++)
+            //{
+            //    _itemItemMatrix.Add(new List<double>());
+
+            //    for (int j = 0; j < _itemTagMatrix.Count; j++)
+                    for (int i = 0; i < 2000; i++)
+            {
+                _itemItemMatrix.Add(new List<double>());
+
+                for(int j = 0; j < 2000; j++)
+                {
+                    _itemItemMatrix[i].Add(new double());
+                    //double ijMultSum = 0;
+                    //double iValuesSquareSum = 0, jValuesSquareSum = 0;
+
+                    //for (int k = 0; k < _itemTagMatrix[0].Count; k++)
+                    //{
+                    //    double ikValue = _itemTagMatrix[i].Count > 0 ? _itemTagMatrix[i][k] : 0;
+                    //    double jkValue = _itemTagMatrix[j].Count > 0 ? _itemTagMatrix[j][k] : 0;
+                    //    ijMultSum += ikValue * jkValue;
+                    //    iValuesSquareSum += Math.Pow(ikValue, 2);
+                    //    jValuesSquareSum += Math.Pow(jkValue, 2);
+                    //}
+                    //_itemItemMatrix[i][j] = (double)(ijMultSum / (Math.Sqrt(iValuesSquareSum * jValuesSquareSum)));
+                    //if (double.IsNaN(_itemItemMatrix[i][j]))
+                    //{
+                    //    _itemItemMatrix[i][j] = 0;
+                    //}
+                    _itemItemMatrix[i][j] = random.NextDouble();
+
+                }                           
+            }
+        }
+
         public void CteateItemItemSimilarityMatrix()
         {
             List<double> columnMeans = new List<double>();

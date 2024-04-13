@@ -47,6 +47,7 @@
             checkBox6 = new CheckBox();
             openFileDialog1 = new OpenFileDialog();
             openFileDialog2 = new OpenFileDialog();
+            button5 = new Button();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             SuspendLayout();
             // 
@@ -230,11 +231,22 @@
             // 
             openFileDialog2.FileName = "openFileDialog2";
             // 
+            // button5
+            // 
+            button5.Location = new Point(617, 47);
+            button5.Name = "button5";
+            button5.Size = new Size(75, 23);
+            button5.TabIndex = 17;
+            button5.Text = "button5";
+            button5.UseVisualStyleBackColor = true;
+            button5.Click += button5_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 404);
+            Controls.Add(button5);
             Controls.Add(checkBox6);
             Controls.Add(checkBox5);
             Controls.Add(checkBox4);
@@ -280,5 +292,6 @@
         private CheckBox checkBox6;
         private OpenFileDialog openFileDialog1;
         private OpenFileDialog openFileDialog2;
+        private Button button5;
     }
 }

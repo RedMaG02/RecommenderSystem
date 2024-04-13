@@ -79,6 +79,8 @@ namespace RecommenderSystem
             rs = new(trainDataPath);
             rs.CreateItemUserColumnMatrix();
             rs.CreateItemUserRowMatrix();
+            //rs.CreateItemTagMatrix(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-25m\genome-scores.csv", true);
+            //rs.CteateItemItemSimilarityMatrixContentBased();
             if (checkBox2.Checked)
             {
                 rs.CteateItemItemSimilarityMatrix();
@@ -97,6 +99,12 @@ namespace RecommenderSystem
                 testDataPath = openFileDialog1.FileName;
                 checkBox5.Checked = true;
             }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            rs = new();
+            rs.CreateItemTagMatrix(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-25m\genome-scores.csv", true);
         }
     }
 }
