@@ -24,16 +24,25 @@ namespace RecommenderSystem
             //rs.CteateItemItemSimilarityMatrixAC();
             //rs.PrintUserItemMatrix(@"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\userItemMatrix.csv");
             //rs.PrintItemItemMatrix(@"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\itemItemMatrix.csv");
-            if (checkBox4.Checked && checkBox5.Checked && checkBox6.Checked)
-            {
-                textBox1.Text = Convert.ToString(rs.MAE(rs.GetTestData(testDataPath), Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
-                textBox2.Text = Convert.ToString(rs.RMSE(rs.GetTestData(testDataPath), Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
-            }
-            else
-            {
-                MessageBox.Show("Введите необходимые данные");
 
-            }
+
+
+
+            //if (checkBox4.Checked && checkBox5.Checked && checkBox6.Checked)
+            //{
+            //    textBox1.Text = Convert.ToString(rs.MAE(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
+            //    textBox2.Text = Convert.ToString(rs.RMSE(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Введите необходимые данные");
+
+            //}
+
+            //rs.GetTestData(testDataPath);
+            textBox1.Text = Convert.ToString(rs.MAERandom(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
+            textBox2.Text = Convert.ToString(rs.RMSERandom(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
+
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -76,11 +85,10 @@ namespace RecommenderSystem
 
         private void button4_Click(object sender, EventArgs e)
         {
-            rs = new(trainDataPath);
-            rs.CreateItemUserColumnMatrix();
-            rs.CreateItemUserRowMatrix();
-            //rs.CreateItemTagMatrix(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-25m\genome-scores.csv", true);
-            //rs.CteateItemItemSimilarityMatrixContentBased();
+            rs = new();
+            //rs.CreateItemUserColumnMatrix(trainDataPath);
+            //rs.CreateItemUserRowMatrix(trainDataPath);
+            rs.CreateItemUserMatrixes(trainDataPath);
             if (checkBox2.Checked)
             {
                 rs.CteateItemItemSimilarityMatrix();
@@ -104,7 +112,7 @@ namespace RecommenderSystem
         private void button5_Click(object sender, EventArgs e)
         {
             rs = new();
-            rs.CreateItemTagMatrix(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-25m\genome-scores.csv", true);
+            //rs.CreateItemTagMatrix(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-25m\genome-scores.csv", true);
         }
     }
 }
