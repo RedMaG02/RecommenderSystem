@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace RecommenderSystem
@@ -40,9 +41,43 @@ namespace RecommenderSystem
             //}
 
             //rs.GetTestData(testDataPath);
-            textBox1.Text = Convert.ToString(rs.MAERandom(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
-            textBox2.Text = Convert.ToString(rs.RMSERandom(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
+            (double[,] data, double mae, double rmse, double r) = rs.ProcessTest(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked);
 
+            textBox1.Text = Convert.ToString(mae);
+            textBox2.Text = Convert.ToString(rmse);
+
+            CreateChart(data, (1000, 500));
+
+        }
+
+        private void CreateChart(double[,] data, (int, int) position) 
+        {
+            
+            int size = 100;
+            for (int i = 0; i < data.GetLength(0); i++)
+            {
+                for (int j = 0; j < data.GetLength(1); j++)
+                {
+                    var pb = new PictureBox();
+                    pb.Size = new Size(size, size);
+                    pb.Location = new Point(position.Item1 + (j * size), position.Item2 - (i * size));
+                    Bitmap image = new Bitmap(size, size);
+                    for (int k = 0; k< size; k++)
+                    {
+                        for (int l = 0; l < size; l++)
+                        {
+                            image.SetPixel(k, l, Color.FromArgb(255, 0, 0, (int)(255 * data[i, j])));
+                        }
+                    }
+                    pb.Image = image;
+                    var lb = new Label();
+                    //lb.Location = pb.Location;
+                    lb.Text = Convert.ToString(data[i, j]);
+                    this.Controls.Add(pb);
+                    pb.Controls.Add(lb);
+                    
+                }
+            }
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -89,14 +124,16 @@ namespace RecommenderSystem
             //rs.CreateItemUserColumnMatrix(trainDataPath);
             //rs.CreateItemUserRowMatrix(trainDataPath);
             rs.CreateItemUserMatrixes(trainDataPath);
-            if (checkBox2.Checked)
-            {
-                rs.CteateItemItemSimilarityMatrix();
-            }
-            else
-            {
-                rs.CteateItemItemSimilarityMatrixAC();
-            }
+            //if (checkBox2.Checked)
+            //{
+            //    rs.CteateItemItemSimilarityMatrix();
+            //}
+            //else
+            //{
+            //    rs.CteateItemItemSimilarityMatrixAC();
+            //}
+            rs.GetGenresData(testDataPath);
+            rs.CteateItemItemSimilarityMatrixGenresBasedV2();
             checkBox6.Checked = true;
         }
 
@@ -114,5 +151,6 @@ namespace RecommenderSystem
             rs = new();
             //rs.CreateItemTagMatrix(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-25m\genome-scores.csv", true);
         }
+
     }
 }

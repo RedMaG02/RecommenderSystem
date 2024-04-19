@@ -20,7 +20,7 @@ namespace RecommenderSystem
         public List<List<float>> _itemTagMatrix = new();
         public string _dataPath;
         public ValueType _valueType;
-        public List<List<int>> _moviesGenres;
+        public List<HashSet<int>> _moviesGenres;
         public Dictionary<string, int> _genres;
         public List<(int, int, double)> _testData;
 
@@ -35,6 +35,8 @@ namespace RecommenderSystem
         public void GetGenresData(string dataPath, bool startFrom1 = true)
         {
             StreamReader sr = new StreamReader(dataPath);
+            _moviesGenres = new();
+            _genres = new Dictionary<string, int>();
             int corrector = startFrom1 ? 1 : 0;
             string line;
             CultureInfo cultureInfo = new("en-US");
@@ -48,7 +50,7 @@ namespace RecommenderSystem
                     int elementsToAdd = movieId - _moviesGenres.Count + 1;
                     for (int i = 0; i < elementsToAdd; i++)
                     {
-                        _moviesGenres.Add(new List<int>());
+                        _moviesGenres.Add(new HashSet<int>());
                     }
                 }
 
@@ -272,20 +274,24 @@ namespace RecommenderSystem
             {
                 if (!double.IsNaN(userMean + (weightsMultRatingSum / weightsAbsoluteSum)))
                 {
-                    return userMean + (weightsMultRatingSum / weightsAbsoluteSum);
+                    return Math.Abs(userMean + (weightsMultRatingSum / weightsAbsoluteSum));
                 }
                 else
                 {
-                    return -100;
+                    return 3;
+                    //return -100;
                 }
             }
             else
             {
                 if (!double.IsNaN(weightsMultRatingSum / weightsAbsoluteSum))
                 {
-                    return weightsMultRatingSum / weightsAbsoluteSum;
+                    return Math.Abs(weightsMultRatingSum / weightsAbsoluteSum);
                 }
-                else { return -100; }
+                else {
+                    return 3;
+                    //return -100;
+                    }
             }
         }
 
@@ -321,16 +327,70 @@ namespace RecommenderSystem
             }
             sw.Close ();
         }
-        public double MAE(List<(int, int, double)> testValues, int k, bool useNormalization)
+
+        private List<double> GetPredictedRatings (List<(int, int)> testValues, int k, bool useNormalization)
+        {
+            List<double> result = new List<double>();
+            foreach (var val in testValues)
+            {
+                result.Add(GetPredictedRatingFromUserToItem(val.Item1, val.Item2, k, useNormalization));
+            }
+            return result;
+        }
+
+        public (double[,], double, double, double) ProcessTest(List<(int, int, double)> testValues, int k, bool useNormalization)
+        {
+            List<(int, int)> userMovieList = testValues
+                .Select(x => (x.Item1, x.Item2)).ToList();
+            List<double> predictedRatings = GetPredictedRatings(userMovieList, k, useNormalization);
+            List<(double, double)> predictedActualRatings = predictedRatings.Zip(testValues, (first, second) => (first, second.Item3)).ToList();
+
+            double mae = MAE(predictedActualRatings);
+            double rmse = RMSE(predictedActualRatings);
+            double r = DeterminationKoef(predictedActualRatings);
+            double[,] data = GetDataForChart(predictedActualRatings);
+
+            return (data, mae, rmse, r);
+        }
+
+        public double[,] GetDataForChart(List<(double, double)> data)
+        {
+            int[,] stars = new int[5, 5];
+            double actual, predicted;
+            for (int i = 0; i < data.Count;  i++)
+            {
+                predicted = data[i].Item1 > 0.5 ? data[i].Item1 : 1;
+                actual = data[i].Item2;
+                stars[(int)actual - 1, (int)Math.Round(predicted) - 1]++;
+            }
+            double[,] result = new double[5, 5];
+
+            for (int i = 0; i < 5; i++)
+            {
+                int count = 0;
+                for (int j = 0; j < 5; j++)
+                {
+                    count += stars[i,j];
+                }
+                for (int j = 0;j < 5; j++)
+                {
+                    result[i,j] = (double)stars[i,j]/count;
+                }
+            }
+            return result;
+        }
+
+        public double MAE(List<(double, double)> testValues)
         {
             double sumError = 0;
             int none = 0;
             for (int i = 0; i < testValues.Count; i++)
             {
-                double rating = GetPredictedRatingFromUserToItem(testValues[i].Item1, testValues[i].Item2, k, useNormalization);
-                if (rating != -100)
+                double predRating = testValues[i].Item1;
+                double actualRating = testValues[i].Item2;
+                if (predRating != -100)
                 {
-                    sumError += Math.Abs(rating - testValues[i].Item3);
+                    sumError += Math.Abs(predRating - actualRating);
                 }
                 else
                 {
@@ -340,36 +400,17 @@ namespace RecommenderSystem
             return sumError/(testValues.Count() - none);
         }
 
-        public double MAERandom(List<(int, int, double)> testValues, int k, bool useNormalization)
-        {
-            double sumError = 0;
-            int none = 0;
-            Random random = new Random();
-            List<double> ints = new List<double>() {1, 1.5, 2, 2.5, 3, 3.5,4,4.5,5 };
-            for (int i = 0; i < testValues.Count; i++)
-            {
-                double rating = ints[random.Next(0, 9)];
-                if (rating != -100)
-                {
-                    sumError += Math.Abs(rating - testValues[i].Item3);
-                }
-                else
-                {
-                    none++;
-                }
-            }
-            return sumError / (testValues.Count() - none);
-        }
-        public double RMSE(List<(int, int, double)> testValues, int k, bool useNormalization)
+        public double RMSE(List<(double, double)> testValues)
         {
             double sumError = 0;
             int none = 0;
             for (int i = 0; i < testValues.Count; i++)
             {
-                double rating = GetPredictedRatingFromUserToItem(testValues[i].Item1, testValues[i].Item2, k, useNormalization);
-                if (rating != -100)
+                double predRating = testValues[i].Item1;
+                double actualRating = testValues[i].Item2;
+                if (predRating != -100)
                 {
-                    sumError += Math.Pow(rating - testValues[i].Item3, 2);
+                    sumError += Math.Pow(predRating - actualRating, 2);
                 }
                 else
                 {
@@ -380,27 +421,19 @@ namespace RecommenderSystem
             return Math.Sqrt(sumError / (testValues.Count() - none));
         }
 
-        public double RMSERandom(List<(int, int, double)> testValues, int k, bool useNormalization)
-        {
-            double sumError = 0;
-            int none = 0;
-            Random random = new Random();
-            List<double> ints = new List<double>() { 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5 };
-            for (int i = 0; i < testValues.Count; i++)
-            {
-                double rating = ints[random.Next(0, 9)];
-                if (rating != -100)
-                {
-                    sumError += Math.Pow(rating - testValues[i].Item3, 2);
-                }
-                else
-                {
-                    none++;
-                }
 
-            }
-            return Math.Sqrt(sumError / (testValues.Count() - none));
+        public double DeterminationKoef(List<(double, double)> testValues)
+        {
+            double rmse = RMSE(testValues);
+
+            double average = testValues.Average(x => x.Item2);
+            List<(double, double)> averageActual = testValues.Select(x => (average, x.Item2)).ToList();
+            double averageRMSE = RMSE(averageActual);
+
+            return 1 - (rmse / averageRMSE);
         }
+
+
         public void GetTestData(string filePath) 
         {
             StreamReader streamReader = new StreamReader(filePath);
@@ -510,6 +543,74 @@ namespace RecommenderSystem
                 }
             }
         }
+
+        public void CteateItemItemSimilarityMatrixGenresBasedV1()
+        {
+            _itemItemMatrix = new();
+            for (int i = 0; i < _itemUserMatrixByColumn.Count; i++)
+            {
+                _itemItemMatrix.Add(new List<double>());
+
+                for (int j = 0; j < _itemUserMatrixByColumn.Count; j++)
+                {
+                    _itemItemMatrix[i].Add(new double());
+                    double ijMultSum = 0;
+                    double iValuesSquareSum = 0, jValuesSquareSum = 0;
+
+                    for (int k = 0; k < _genres.Count; k++)
+                    {
+                        double ikValue = _moviesGenres[i].Contains(k) ? 1 : 0;
+                        double jkValue = _moviesGenres[j].Contains(k) ? 1 : 0;
+                        ijMultSum += ikValue * jkValue;
+                        iValuesSquareSum += Math.Pow(ikValue, 2);
+                        jValuesSquareSum += Math.Pow(jkValue, 2);
+                    }
+                    _itemItemMatrix[i][j] = (double)(ijMultSum / (Math.Sqrt(iValuesSquareSum * jValuesSquareSum)));
+                    if (double.IsNaN(_itemItemMatrix[i][j]))
+                    {
+                        _itemItemMatrix[i][j] = 0;
+                    }
+
+                }
+            }
+        }
+
+
+        public void CteateItemItemSimilarityMatrixGenresBasedV2()
+        {
+            _itemItemMatrix = new();
+            for (int i = 0; i < _itemUserMatrixByColumn.Count; i++)
+            {
+                _itemItemMatrix.Add(new List<double>());
+
+                for (int j = 0; j < _itemUserMatrixByColumn.Count; j++)
+                {
+                    _itemItemMatrix[i].Add(new double());
+                    double ijMultSum = 0;
+                    double iValuesSquareSum = 0, jValuesSquareSum = 0;
+
+                    for (int k = 0; k < _genres.Count; k++)
+                    {
+                        if (_moviesGenres[i].Contains(k) || _moviesGenres[j].Contains(k))
+                        {
+                            double ikValue = _moviesGenres[i].Contains(k) ? 1 : 0;
+                            double jkValue = _moviesGenres[j].Contains(k) ? 1 : 0;
+                            ijMultSum += ikValue * jkValue;
+                            iValuesSquareSum += Math.Pow(ikValue, 2);
+                            jValuesSquareSum += Math.Pow(jkValue, 2);
+                        }
+                    }
+                    _itemItemMatrix[i][j] = (double)(ijMultSum / (Math.Sqrt(iValuesSquareSum * jValuesSquareSum)));
+                    if (double.IsNaN(_itemItemMatrix[i][j]))
+                    {
+                        _itemItemMatrix[i][j] = 0;
+                    }
+
+                }
+            }
+        }
+
+
 
         public void CteateItemItemSimilarityMatrixAC()
         {
