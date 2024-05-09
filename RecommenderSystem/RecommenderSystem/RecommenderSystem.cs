@@ -7,6 +7,9 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Complex;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace RecommenderSystem
 {
@@ -21,7 +24,27 @@ namespace RecommenderSystem
         public string _dataPath;
         public ValueType _valueType;
         public List<HashSet<int>> _moviesGenres;
-        public Dictionary<string, int> _genres;
+        public Dictionary<string, int> _genres = new Dictionary<string, int>() 
+        {
+            { "Action", 0 },
+            { "Adventure", 1 },
+            { "Animation", 2 },
+            { "Children's", 3 },
+            { "Comedy", 4 },
+            { "Crime", 5 },
+            { "Documentary", 6 },
+            { "Drama", 7 },
+            { "Fantasy", 8 },
+            { "Film-Noir", 9 },
+            { "Horror", 10 },
+            { "Musical", 11 },
+            { "Mystery", 12 },
+            { "Romance", 13 },
+            { "Sci-Fi", 14 },
+            { "Thriller", 15 },
+            { "War", 16 },
+            { "Western", 17 }
+        };
         public List<(int, int, double)> _testData;
 
         public RecommenderSystem(string dataPath)
@@ -36,7 +59,7 @@ namespace RecommenderSystem
         {
             StreamReader sr = new StreamReader(dataPath);
             _moviesGenres = new();
-            _genres = new Dictionary<string, int>();
+            //_genres = new Dictionary<string, int>();
             int corrector = startFrom1 ? 1 : 0;
             string line;
             CultureInfo cultureInfo = new("en-US");
@@ -58,10 +81,10 @@ namespace RecommenderSystem
 
                 foreach (string genre in genres)
                 {
-                    if (!_genres.ContainsKey(genre))
-                    {
-                        _genres[genre] = _genres.Count;
-                    }
+                    //if (!_genres.ContainsKey(genre))
+                    //{
+                    //    _genres[genre] = _genres.Count;
+                    //}
                     _moviesGenres[movieId].Add(_genres[genre]);    
                 }
              }        
@@ -227,7 +250,10 @@ namespace RecommenderSystem
             //
             userItemsWithRatings.Sort((a, b) => b.Item2.CompareTo(a.Item2));
             // remove self
-            userItemsWithRatings.RemoveAt(0);
+            if (userItemsWithRatings.Count > 0 )
+            {
+                userItemsWithRatings.RemoveAt(0);
+            }
             return userItemsWithRatings;
            
         }
@@ -254,8 +280,8 @@ namespace RecommenderSystem
 
             if (userItemsWithRatings.Count < k)
             {
-                k = userItemsWithRatings.Count;
-                //return -100;
+                //k = userItemsWithRatings.Count;
+                return -100;
             }
 
             for (int i = 0; i < k; i++)
@@ -278,8 +304,8 @@ namespace RecommenderSystem
                 }
                 else
                 {
-                    return 3;
-                    //return -100;
+                    //return 3;
+                    return -100;
                 }
             }
             else
@@ -289,8 +315,8 @@ namespace RecommenderSystem
                     return Math.Abs(weightsMultRatingSum / weightsAbsoluteSum);
                 }
                 else {
-                    return 3;
-                    //return -100;
+                    //return 3;
+                    return -100;
                     }
             }
         }
@@ -338,19 +364,44 @@ namespace RecommenderSystem
             return result;
         }
 
-        public (double[,], double, double, double) ProcessTest(List<(int, int, double)> testValues, int k, bool useNormalization)
+        private List<double> GetPredictedRatingsLinearRegression(List<(int, int)> testValues)
+        {
+            List<double> result = new List<double>();
+            foreach (var val in testValues)
+            {
+                result.Add(GetPredictedRatingLinearRegression(val.Item1, val.Item2));
+            }
+            return result;
+        }
+
+        public (double[,], double, double, double, int) ProcessTest(List<(int, int, double)> testValues, int k, bool useNormalization)
         {
             List<(int, int)> userMovieList = testValues
                 .Select(x => (x.Item1, x.Item2)).ToList();
             List<double> predictedRatings = GetPredictedRatings(userMovieList, k, useNormalization);
-            List<(double, double)> predictedActualRatings = predictedRatings.Zip(testValues, (first, second) => (first, second.Item3)).ToList();
+            //List<double> predictedRatings = GetPredictedRatingsLinearRegression(userMovieList);
+            //List<double> predictedRatings = GetRandomRatings(testValues.Count);
+
+            List <(double, double)> predictedActualRatings = predictedRatings.Zip(testValues, (first, second) => (first, second.Item3))
+                .Where(pair => pair.Item1 != -100).ToList();
 
             double mae = MAE(predictedActualRatings);
             double rmse = RMSE(predictedActualRatings);
             double r = DeterminationKoef(predictedActualRatings);
             double[,] data = GetDataForChart(predictedActualRatings);
 
-            return (data, mae, rmse, r);
+            return (data, mae, rmse, r, predictedActualRatings.Count());
+        }
+
+        private List<double> GetRandomRatings(int count)
+        {
+            List<double> result = new List<double>();
+            Random random = new Random();
+            for (int i = 0; i < count; i++)
+            {
+                result.Add(random.Next(1, 6));
+            }
+            return result;
         }
 
         public double[,] GetDataForChart(List<(double, double)> data)
@@ -360,6 +411,7 @@ namespace RecommenderSystem
             for (int i = 0; i < data.Count;  i++)
             {
                 predicted = data[i].Item1 > 0.5 ? data[i].Item1 : 1;
+                predicted = data[i].Item1 > 5 ? 5 : predicted;
                 actual = data[i].Item2;
                 stars[(int)actual - 1, (int)Math.Round(predicted) - 1]++;
             }
@@ -447,6 +499,38 @@ namespace RecommenderSystem
                 count++;
             }
             _testData = result;
+        }
+
+        public double GetPredictedRatingLinearRegression(int user, int item)
+        {
+            Matrix<double> A = MathNet.Numerics.LinearAlgebra.Double.DenseMatrix.Create(_itemUserMatrixByRow[user].Count, _genres.Count, 0);
+            Vector<double> y = MathNet.Numerics.LinearAlgebra.Double.DenseVector.Create(_itemUserMatrixByRow[user].Count, 0);
+            Matrix<double> I = MathNet.Numerics.LinearAlgebra.Double.DiagonalMatrix.Create(_genres.Count, _genres.Count,  _ => 1);
+            double lambda = 0.5;
+
+            for (int i = 0; i < A.RowCount; i++)
+            {
+                foreach (int genreId in _moviesGenres[_itemUserMatrixByRow[user][i].Item1])
+                {
+                    A[i, genreId] = 1;
+                }
+                y[i] = _itemUserMatrixByRow[user][i].Item2;
+            }
+
+            Matrix<double> AT = A.Transpose();
+
+            Vector<double> W = AT.Multiply(A).Add(lambda * I).Inverse().Multiply(AT).Multiply(y);
+
+
+            Vector<double> X = MathNet.Numerics.LinearAlgebra.Double.DenseVector.Create(_genres.Count, 0);
+            foreach (int genreId in _moviesGenres[item])
+            {
+                X[genreId] = 1;
+            }
+
+            double rating = W.DotProduct(X);
+            
+            return rating;
         }
 
         //public void CteateItemItemSimilarityMatrixContentBased()
@@ -537,7 +621,7 @@ namespace RecommenderSystem
                     }
                     _itemItemMatrix[i][j] = (double)(ijMultSum / (Math.Sqrt(iValuesSquareSum * jValuesSquareSum)));
                     if (double.IsNaN(_itemItemMatrix[i][j]))
-                    {
+                    {         
                         _itemItemMatrix[i][j] = 0;
                     }
                 }
