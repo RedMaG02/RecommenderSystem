@@ -21,6 +21,19 @@ namespace RecommenderSystem
             checkBox5.Enabled = false;
             checkBox6.Enabled = false;
             checkBox2.Checked = true;
+            label35.AutoSize = false;
+            label35.Paint += Label35_Paint;
+        }
+
+        private void Label35_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.Clear(this.BackColor);
+            e.Graphics.RotateTransform(-90);
+            SizeF textSize = e.Graphics.MeasureString(label35.Text, label35.Font);
+            label35.Width = (int)textSize.Height + 2;
+            label35.Height = (int)textSize.Width + 2;
+            e.Graphics.TranslateTransform(-label35.Height / 2, label35.Width / 2);
+            e.Graphics.DrawString(label35.Text, label35.Font, Brushes.Black, -(textSize.Width / 2), -(textSize.Height / 2));
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -47,13 +60,16 @@ namespace RecommenderSystem
             //}
 
             //rs.GetTestData(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-1m\ratings.dat");
-            (double[,] data, double mae, double rmse, double r, int count) = rs.ProcessTest(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked);
+            (double[,] data, double mae, double rmse, double r, int count, double accuracy, double precision, double recall) = rs.ProcessTest(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked);
 
 
             textBox1.Text = Convert.ToString(mae);
             textBox2.Text = Convert.ToString(rmse);
             textBox3.Text = Convert.ToString(r);
             textBox4.Text = Convert.ToString(count);
+            textBox5.Text = Convert.ToString(accuracy);
+            textBox6.Text = Convert.ToString(precision);
+            textBox7.Text = Convert.ToString(recall);
 
             CreateChart(data, (1000, 500));
 
@@ -65,37 +81,37 @@ namespace RecommenderSystem
             int size = 100;
 
             var pb = new PictureBox();
-            pb.Size = new Size(size * 5, size/2);
+            pb.Size = new Size(size * 5, size / 2);
             pb.Location = new Point(position.Item1, (int)(position.Item2 - size * 4.75));
 
-            int startX =0; // начальное положение по X
+            int startX = 0;
 
-            // Создаем изображение, на котором будем рисовать
+
             Bitmap image = new Bitmap(size * 5, size);
             int totalRectangles = 100;
             int rectWidth = size * 5 / totalRectangles;
 
-            // Создаем графический объект из изображения
+
             using (Graphics g = Graphics.FromImage(image))
             {
 
                 for (int i = 0; i < totalRectangles; i++)
                 {
-                    // Выбираем цвет для текущего прямоугольника
 
-                    double hue = 240 + 120 * ((double)i /totalRectangles);
+
+                    double hue = 240 + 120 * ((double)i / totalRectangles);
                     double saturation = 1;
                     double value = 0.3 + 0.7 * ((double)i / totalRectangles);
 
                     Color color = ColorFromHSV(hue, saturation, value);
 
-                    // Создаем прямоугольник
+
                     Rectangle rectangle = new Rectangle(startX, 0, rectWidth, 50);
 
-                    // Заполняем прямоугольник выбранным цветом
+
                     g.FillRectangle(new SolidBrush(color), rectangle);
 
-                    // Обновляем начальное положение для следующего прямоугольника
+
                     startX += rectWidth;
 
                     if ((i - 10) % 20 == 0 && i != 10)
@@ -129,51 +145,25 @@ namespace RecommenderSystem
             {
                 for (int j = 0; j < data.GetLength(1); j++)
                 {
-                    //var pb = new PictureBox();
-                    //pb.Size = new Size(size, size);
-                    //pb.Location = new Point(position.Item1 + (j * size), position.Item2 - (i * size));
-                    //Bitmap image = new Bitmap(size, size);
-                    //for (int k = 0; k < size; k++)
-                    //{
-                    //    for (int l = 0; l < size; l++)
-                    //    {
-                    //        image.SetPixel(k, l, Color.FromArgb(255, 0, 0, (int)(150 * data[i, j] + 50)));
-                    //    }
-                    //}
-                    //pb.Image = image;
-                    //var lb = new Label();
-                    ////lb.Location = pb.Location;
-                    //lb.Text = Convert.ToString(data[i, j]);
-                    //lb.Width = 50;
-                    //lb.Height = 50;
-                    //this.Controls.Add(pb);
-                    //pb.Controls.Add(lb);
-                    //lb.Location = pb.Location;
-
-
                     pb = new PictureBox();
                     pb.Size = new Size(size, size);
                     pb.Location = new Point(position.Item1 + (j * size), position.Item2 - (i * size));
                     image = new Bitmap(size, size);
                     using (Graphics g = Graphics.FromImage(image))
                     {
-                        //g.Clear(Color.FromArgb(255, 0, 0, (int)(175 * data[i, j] + 25))); // Очистка изображения (можно изменить цвет фона)
-                        //int blue = (int)(255 * (1 - data[i, j])); // Рассчитываем синий компонент
-                        //int green = (int)(255 * data[i, j]); // Рассчитываем зеленый компонент
-                        //int red = (int)(255 * data[i, j]); // Фиксируем максимальное значение красного
                         double hue = 240 + 120 * data[i, j];
                         double saturation = 1;
                         double value = 0.3 + 0.7 * data[i, j];
-                        
+
 
                         g.Clear(ColorFromHSV(hue, saturation, value));
                         string text = Convert.ToString(Math.Round(data[i, j], 2));
-                        Font font = new Font("Arial", 12, FontStyle.Bold); // Установка шрифта и размера
-                        SizeF textSize = g.MeasureString(text, font); // Определение размеров текста
-                        g.DrawString(text, font, Brushes.White, new PointF((size - textSize.Width) / 2, (size - textSize.Height) / 2)); // Рисование текста по центру
+                        Font font = new Font("Arial", 12, FontStyle.Bold);
+                        SizeF textSize = g.MeasureString(text, font);
+                        g.DrawString(text, font, Brushes.White, new PointF((size - textSize.Width) / 2, (size - textSize.Height) / 2));
 
-                        Pen borderPen = new Pen(Color.White, 2); // Толщина рамки и ее цвет
-                        g.DrawRectangle(borderPen, 0, 0, size - 1, size - 1); // Рисование прямоугольника вокруг изображения
+                        Pen borderPen = new Pen(Color.White, 2);
+                        g.DrawRectangle(borderPen, 0, 0, size - 1, size - 1);
 
                     }
                     pb.Image = image;
@@ -301,18 +291,33 @@ namespace RecommenderSystem
             var training_data = RatingData.Read(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-1m\ratings.dat");
             var test_data = RatingData.Read(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-1m\ratings.dat");
 
-            // set up the recommender
+
             var recommender = new UserItemBaseline();
             recommender.Ratings = training_data;
             recommender.Train();
 
-            // measure the accuracy on the test data set
+
             var results = recommender.Evaluate(test_data);
             MessageBox.Show($"RMSE={results["RMSE"]} MAE={results["MAE"]}");
             MessageBox.Show(results.ToString());
         }
 
         private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox16_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox17_TextChanged(object sender, EventArgs e)
         {
 
         }
