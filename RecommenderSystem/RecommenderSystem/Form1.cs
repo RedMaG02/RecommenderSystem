@@ -2,6 +2,7 @@ using Microsoft.VisualBasic.ApplicationServices;
 using MyMediaLite.Eval;
 using MyMediaLite.IO;
 using MyMediaLite.RatingPrediction;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reflection.Emit;
 using System.Windows.Forms;
@@ -12,6 +13,7 @@ namespace RecommenderSystem
     public partial class Form1 : Form
     {
         private string trainDataPath;
+        private string movieDataPath;
         private string testDataPath;
         RecommenderSystem rs;
         public Form1()
@@ -23,6 +25,7 @@ namespace RecommenderSystem
             checkBox2.Checked = true;
             label35.AutoSize = false;
             label35.Paint += Label35_Paint;
+            rs = new RecommenderSystem();
         }
 
         private void Label35_Paint(object sender, PaintEventArgs e)
@@ -36,31 +39,9 @@ namespace RecommenderSystem
             e.Graphics.DrawString(label35.Text, label35.Font, Brushes.Black, -(textSize.Width / 2), -(textSize.Height / 2));
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ProcessRating(RecommendationTypes type, int k = 1, bool useNormalisation = false)
         {
-            //RecommenderSystem rs = new(@"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\trainData.csv");
-            //rs.CreateItemUserColumnMatrix();
-            //rs.CreateItemUserRowMatrix();
-            //rs.CteateItemItemSimilarityMatrixAC();
-            //rs.PrintUserItemMatrix(@"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\userItemMatrix.csv");
-            //rs.PrintItemItemMatrix(@"J:\RecommenderSystem\RecommenderSystem\RecommenderSystem\itemItemMatrix.csv");
-
-
-
-
-            //if (checkBox4.Checked && checkBox5.Checked && checkBox6.Checked)
-            //{
-            //    textBox1.Text = Convert.ToString(rs.MAE(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
-            //    textBox2.Text = Convert.ToString(rs.RMSE(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked));
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Введите необходимые данные");
-
-            //}
-
-            //rs.GetTestData(@"C:\Users\RedMa\OneDrive\Рабочий стол\Курсач\ml-1m\ratings.dat");
-            (double[,] data, double mae, double rmse, double r, int count, double accuracy, double precision, double recall) = rs.ProcessTest(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked);
+            (double[,] data, double mae, double rmse, double r, int count, double accuracy, double precision, double recall) = rs.ProcessTest(rs._testData, k, useNormalisation, type);
 
 
             textBox1.Text = Convert.ToString(mae);
@@ -72,11 +53,25 @@ namespace RecommenderSystem
             textBox7.Text = Convert.ToString(recall);
 
             CreateChart(data, (1000, 500));
+        }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ProcessRating(RecommendationTypes.CollaborativeFiltering, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked);
         }
 
         private void CreateChart(double[,] data, (int, int) position)
         {
+
+
+            foreach (Control control in this.Controls)
+            {
+                if (control is PictureBox)
+                {
+                    this.Controls.Remove(control);
+                    control.Dispose();
+                }
+            }
 
             int size = 100;
 
@@ -242,18 +237,18 @@ namespace RecommenderSystem
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 trainDataPath = openFileDialog1.FileName;
+                testDataPath = trainDataPath;
                 checkBox4.Checked = true;
+                if (checkBox_UseTrainDataAsTest.Checked)
+                {
+                    rs.CreateItemUserMatrixes(trainDataPath, false);
+                    rs.GetTestData(trainDataPath);
+                }
             }
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            rs = new();
-            //rs.CreateItemUserColumnMatrix(trainDataPath);
-            //rs.CreateItemUserRowMatrix(trainDataPath);
-
-
-            rs.CreateItemUserMatrixes(trainDataPath);
             if (checkBox2.Checked)
             {
                 rs.CteateItemItemSimilarityMatrix();
@@ -263,10 +258,6 @@ namespace RecommenderSystem
                 rs.CteateItemItemSimilarityMatrixAC();
             }
 
-
-            //rs.GetGenresData(testDataPath);
-
-
             //rs.CteateItemItemSimilarityMatrixGenresBasedV2();
             checkBox6.Checked = true;
         }
@@ -275,8 +266,9 @@ namespace RecommenderSystem
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                testDataPath = openFileDialog1.FileName;
+                movieDataPath = openFileDialog1.FileName;
                 checkBox5.Checked = true;
+                rs.GetGenresData(movieDataPath);
             }
         }
 
@@ -309,7 +301,7 @@ namespace RecommenderSystem
 
         private void button7_Click(object sender, EventArgs e)
         {
-
+            ProcessRating(RecommendationTypes.LinearRegression);
         }
 
         private void textBox16_TextChanged(object sender, EventArgs e)
@@ -320,6 +312,62 @@ namespace RecommenderSystem
         private void textBox17_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void checkBox_UseTrainDataAsTest_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button_ContentSimilarityMatrix_Click(object sender, EventArgs e)
+        {
+            if (checkBox5.Checked)
+            {
+                Stopwatch sw = Stopwatch.StartNew();
+                rs.CteateItemItemSimilarityMatrixGenresBasedV1();
+                sw.Stop();
+                timeTextBox_ContentSimilarity.Text = $"{sw.ElapsedMilliseconds}";
+                checkBox8.Checked = true;
+            }
+            else
+            {
+                MessageBox.Show("Заполните информацию о данных");
+            }
+        }
+
+        private void button_ContentBasedResult_Click(object sender, EventArgs e)
+        {
+            ProcessRating(RecommendationTypes.ContentBasedFiltering, Convert.ToInt32(numericUpDown2.Value), checkBox9.Checked);
+        }
+
+        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button_MonolithResult_Click(object sender, EventArgs e)
+        {
+            ProcessRating(RecommendationTypes.MonolithHybrid, Convert.ToInt32(numericUpDown3.Value), checkBox11.Checked);
+        }
+
+        private void button_AnsambleResult_Click(object sender, EventArgs e)
+        {
+            ProcessRating(RecommendationTypes.AnsembleHybrid);
+        }
+
+        private void uniform_Click(object sender, EventArgs e)
+        {
+            ProcessRating(RecommendationTypes.UniformRandom);
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            ProcessRating(RecommendationTypes.NormalRandom);
+        }
+
+        private void button4_Click_1(object sender, EventArgs e)
+        {
+            ProcessRating(RecommendationTypes.Num);
         }
     }
 }

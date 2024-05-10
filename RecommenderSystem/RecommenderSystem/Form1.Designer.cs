@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
+            button_CollaborativeResult = new Button();
             textBox1 = new TextBox();
             textBox2 = new TextBox();
             label1 = new Label();
@@ -41,7 +41,7 @@
             checkBox2 = new CheckBox();
             checkBox3 = new CheckBox();
             label4 = new Label();
-            button4 = new Button();
+            button_CollaborativeSimilarity = new Button();
             checkBox4 = new CheckBox();
             checkBox5 = new CheckBox();
             checkBox6 = new CheckBox();
@@ -67,41 +67,41 @@
             textBox6 = new TextBox();
             label19 = new Label();
             textBox7 = new TextBox();
-            checkBox7 = new CheckBox();
-            button5 = new Button();
+            checkBox_UseTrainDataAsTest = new CheckBox();
+            button_ContentSimilarityMatrix = new Button();
             checkBox8 = new CheckBox();
             label20 = new Label();
             numericUpDown2 = new NumericUpDown();
             checkBox9 = new CheckBox();
-            button6 = new Button();
-            button7 = new Button();
-            button8 = new Button();
-            textBox8 = new TextBox();
-            textBox9 = new TextBox();
+            button_ContentBasedResult = new Button();
+            button_LinearRegressionResult = new Button();
+            button_MonolithResult = new Button();
+            weight1TextBoxMonolith = new TextBox();
+            weight2TextBoxMonolith = new TextBox();
             label21 = new Label();
             label22 = new Label();
-            button9 = new Button();
+            button_MonolithSimilarity = new Button();
             checkBox10 = new CheckBox();
             label23 = new Label();
             numericUpDown3 = new NumericUpDown();
             checkBox11 = new CheckBox();
             label24 = new Label();
             label25 = new Label();
-            textBox10 = new TextBox();
-            textBox11 = new TextBox();
+            weight2TextBoxAnsamble = new TextBox();
+            weight1TextBoxAnsamble = new TextBox();
             label26 = new Label();
-            textBox12 = new TextBox();
-            button10 = new Button();
-            button11 = new Button();
-            button12 = new Button();
+            weight3TextBoxAnsamble = new TextBox();
+            button_AnsambleResult = new Button();
+            button_GetBestCoefsForMonolith = new Button();
+            button_GetBestCoefsAnsamble = new Button();
             textBox13 = new TextBox();
             textBox14 = new TextBox();
-            textBox15 = new TextBox();
-            textBox16 = new TextBox();
-            textBox17 = new TextBox();
-            textBox18 = new TextBox();
-            textBox19 = new TextBox();
-            textBox20 = new TextBox();
+            timeTextBox_ContentSimilarity = new TextBox();
+            timeTextBox_ContentBased = new TextBox();
+            timeTextBox_MonolithSimilarity = new TextBox();
+            timeTextBoxMonolithResult = new TextBox();
+            timeTextBoxLinearRegression = new TextBox();
+            timeTextBoxAnsamble = new TextBox();
             label27 = new Label();
             label28 = new Label();
             label29 = new Label();
@@ -112,22 +112,25 @@
             label34 = new Label();
             label35 = new Label();
             label36 = new Label();
+            uniform = new Button();
+            button1 = new Button();
+            button4 = new Button();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
             SuspendLayout();
             // 
-            // button1
+            // button_CollaborativeResult
             // 
-            button1.BackColor = Color.LightBlue;
-            button1.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button1.Location = new Point(292, 424);
-            button1.Name = "button1";
-            button1.Size = new Size(196, 73);
-            button1.TabIndex = 0;
-            button1.Text = "Рассчитать коллаборативная фильтрация";
-            button1.UseVisualStyleBackColor = false;
-            button1.Click += button1_Click;
+            button_CollaborativeResult.BackColor = Color.LightBlue;
+            button_CollaborativeResult.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_CollaborativeResult.Location = new Point(292, 424);
+            button_CollaborativeResult.Name = "button_CollaborativeResult";
+            button_CollaborativeResult.Size = new Size(196, 73);
+            button_CollaborativeResult.TabIndex = 0;
+            button_CollaborativeResult.Text = "Рассчитать коллаборативная фильтрация";
+            button_CollaborativeResult.UseVisualStyleBackColor = false;
+            button_CollaborativeResult.Click += button1_Click;
             // 
             // textBox1
             // 
@@ -168,7 +171,7 @@
             // button2
             // 
             button2.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button2.Location = new Point(12, 29);
+            button2.Location = new Point(12, 100);
             button2.Name = "button2";
             button2.Size = new Size(191, 70);
             button2.TabIndex = 5;
@@ -179,7 +182,7 @@
             // button3
             // 
             button3.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button3.Location = new Point(12, 117);
+            button3.Location = new Point(14, 193);
             button3.Name = "button3";
             button3.Size = new Size(191, 66);
             button3.TabIndex = 6;
@@ -258,22 +261,22 @@
             label4.TabIndex = 12;
             label4.Text = "Подсчет схожести продуктов на основе средних оценок:";
             // 
-            // button4
+            // button_CollaborativeSimilarity
             // 
-            button4.BackColor = Color.LightBlue;
-            button4.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button4.Location = new Point(211, 324);
-            button4.Name = "button4";
-            button4.Size = new Size(203, 65);
-            button4.TabIndex = 13;
-            button4.Text = "Рассчитать схожесть коллаборативная фильтрация";
-            button4.UseVisualStyleBackColor = false;
-            button4.Click += button4_Click;
+            button_CollaborativeSimilarity.BackColor = Color.LightBlue;
+            button_CollaborativeSimilarity.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_CollaborativeSimilarity.Location = new Point(211, 324);
+            button_CollaborativeSimilarity.Name = "button_CollaborativeSimilarity";
+            button_CollaborativeSimilarity.Size = new Size(203, 65);
+            button_CollaborativeSimilarity.TabIndex = 13;
+            button_CollaborativeSimilarity.Text = "Рассчитать схожесть коллаборативная фильтрация";
+            button_CollaborativeSimilarity.UseVisualStyleBackColor = false;
+            button_CollaborativeSimilarity.Click += button4_Click;
             // 
             // checkBox4
             // 
             checkBox4.AutoSize = true;
-            checkBox4.Location = new Point(211, 60);
+            checkBox4.Location = new Point(211, 131);
             checkBox4.Name = "checkBox4";
             checkBox4.Size = new Size(15, 14);
             checkBox4.TabIndex = 14;
@@ -282,7 +285,7 @@
             // checkBox5
             // 
             checkBox5.AutoSize = true;
-            checkBox5.Location = new Point(211, 146);
+            checkBox5.Location = new Point(211, 217);
             checkBox5.Name = "checkBox5";
             checkBox5.Size = new Size(15, 14);
             checkBox5.TabIndex = 15;
@@ -491,27 +494,29 @@
             textBox7.Size = new Size(244, 23);
             textBox7.TabIndex = 36;
             // 
-            // checkBox7
+            // checkBox_UseTrainDataAsTest
             // 
-            checkBox7.AutoSize = true;
-            checkBox7.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            checkBox7.Location = new Point(18, 196);
-            checkBox7.Name = "checkBox7";
-            checkBox7.Size = new Size(470, 23);
-            checkBox7.TabIndex = 38;
-            checkBox7.Text = "Использовать тренировочные данные для проверки";
-            checkBox7.UseVisualStyleBackColor = true;
+            checkBox_UseTrainDataAsTest.AutoSize = true;
+            checkBox_UseTrainDataAsTest.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            checkBox_UseTrainDataAsTest.Location = new Point(12, 57);
+            checkBox_UseTrainDataAsTest.Name = "checkBox_UseTrainDataAsTest";
+            checkBox_UseTrainDataAsTest.Size = new Size(470, 23);
+            checkBox_UseTrainDataAsTest.TabIndex = 38;
+            checkBox_UseTrainDataAsTest.Text = "Использовать тренировочные данные для проверки";
+            checkBox_UseTrainDataAsTest.UseVisualStyleBackColor = true;
+            checkBox_UseTrainDataAsTest.CheckedChanged += checkBox_UseTrainDataAsTest_CheckedChanged;
             // 
-            // button5
+            // button_ContentSimilarityMatrix
             // 
-            button5.BackColor = Color.LightGreen;
-            button5.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button5.Location = new Point(12, 524);
-            button5.Name = "button5";
-            button5.Size = new Size(203, 65);
-            button5.TabIndex = 39;
-            button5.Text = "Рассчитать схожесть содержание";
-            button5.UseVisualStyleBackColor = false;
+            button_ContentSimilarityMatrix.BackColor = Color.LightGreen;
+            button_ContentSimilarityMatrix.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_ContentSimilarityMatrix.Location = new Point(12, 524);
+            button_ContentSimilarityMatrix.Name = "button_ContentSimilarityMatrix";
+            button_ContentSimilarityMatrix.Size = new Size(203, 65);
+            button_ContentSimilarityMatrix.TabIndex = 39;
+            button_ContentSimilarityMatrix.Text = "Рассчитать схожесть содержание";
+            button_ContentSimilarityMatrix.UseVisualStyleBackColor = false;
+            button_ContentSimilarityMatrix.Click += button_ContentSimilarityMatrix_Click;
             // 
             // checkBox8
             // 
@@ -542,6 +547,7 @@
             numericUpDown2.Size = new Size(49, 23);
             numericUpDown2.TabIndex = 43;
             numericUpDown2.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            numericUpDown2.ValueChanged += numericUpDown2_ValueChanged;
             // 
             // checkBox9
             // 
@@ -555,55 +561,57 @@
             checkBox9.Text = "Использовать нормализацию оценок (Mean centering)";
             checkBox9.UseVisualStyleBackColor = false;
             // 
-            // button6
+            // button_ContentBasedResult
             // 
-            button6.BackColor = Color.LightGreen;
-            button6.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button6.Location = new Point(292, 630);
-            button6.Name = "button6";
-            button6.Size = new Size(290, 52);
-            button6.TabIndex = 41;
-            button6.Text = "Рассчитать содержание";
-            button6.UseVisualStyleBackColor = false;
+            button_ContentBasedResult.BackColor = Color.LightGreen;
+            button_ContentBasedResult.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_ContentBasedResult.Location = new Point(292, 630);
+            button_ContentBasedResult.Name = "button_ContentBasedResult";
+            button_ContentBasedResult.Size = new Size(290, 52);
+            button_ContentBasedResult.TabIndex = 41;
+            button_ContentBasedResult.Text = "Рассчитать содержание";
+            button_ContentBasedResult.UseVisualStyleBackColor = false;
+            button_ContentBasedResult.Click += button_ContentBasedResult_Click;
             // 
-            // button7
+            // button_LinearRegressionResult
             // 
-            button7.BackColor = Color.LightCoral;
-            button7.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button7.Location = new Point(790, 784);
-            button7.Name = "button7";
-            button7.Size = new Size(290, 52);
-            button7.TabIndex = 45;
-            button7.Text = "Рассчитать Линейная регрессия";
-            button7.UseVisualStyleBackColor = false;
-            button7.Click += button7_Click;
+            button_LinearRegressionResult.BackColor = Color.LightCoral;
+            button_LinearRegressionResult.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_LinearRegressionResult.Location = new Point(790, 784);
+            button_LinearRegressionResult.Name = "button_LinearRegressionResult";
+            button_LinearRegressionResult.Size = new Size(290, 52);
+            button_LinearRegressionResult.TabIndex = 45;
+            button_LinearRegressionResult.Text = "Рассчитать Линейная регрессия";
+            button_LinearRegressionResult.UseVisualStyleBackColor = false;
+            button_LinearRegressionResult.Click += button7_Click;
             // 
-            // button8
+            // button_MonolithResult
             // 
-            button8.BackColor = Color.LightGoldenrodYellow;
-            button8.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button8.Location = new Point(292, 870);
-            button8.Name = "button8";
-            button8.Size = new Size(290, 52);
-            button8.TabIndex = 46;
-            button8.Text = "Рассчитать монолит";
-            button8.UseVisualStyleBackColor = false;
+            button_MonolithResult.BackColor = Color.LightGoldenrodYellow;
+            button_MonolithResult.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_MonolithResult.Location = new Point(292, 870);
+            button_MonolithResult.Name = "button_MonolithResult";
+            button_MonolithResult.Size = new Size(290, 52);
+            button_MonolithResult.TabIndex = 46;
+            button_MonolithResult.Text = "Рассчитать монолит";
+            button_MonolithResult.UseVisualStyleBackColor = false;
+            button_MonolithResult.Click += button_MonolithResult_Click;
             // 
-            // textBox8
+            // weight1TextBoxMonolith
             // 
-            textBox8.BackColor = Color.LightBlue;
-            textBox8.Location = new Point(62, 808);
-            textBox8.Name = "textBox8";
-            textBox8.Size = new Size(55, 23);
-            textBox8.TabIndex = 47;
+            weight1TextBoxMonolith.BackColor = Color.LightBlue;
+            weight1TextBoxMonolith.Location = new Point(62, 808);
+            weight1TextBoxMonolith.Name = "weight1TextBoxMonolith";
+            weight1TextBoxMonolith.Size = new Size(55, 23);
+            weight1TextBoxMonolith.TabIndex = 47;
             // 
-            // textBox9
+            // weight2TextBoxMonolith
             // 
-            textBox9.BackColor = Color.LightGreen;
-            textBox9.Location = new Point(173, 808);
-            textBox9.Name = "textBox9";
-            textBox9.Size = new Size(55, 23);
-            textBox9.TabIndex = 48;
+            weight2TextBoxMonolith.BackColor = Color.LightGreen;
+            weight2TextBoxMonolith.Location = new Point(173, 808);
+            weight2TextBoxMonolith.Name = "weight2TextBoxMonolith";
+            weight2TextBoxMonolith.Size = new Size(55, 23);
+            weight2TextBoxMonolith.TabIndex = 48;
             // 
             // label21
             // 
@@ -627,16 +635,16 @@
             label22.TabIndex = 50;
             label22.Text = "w2";
             // 
-            // button9
+            // button_MonolithSimilarity
             // 
-            button9.BackColor = Color.LemonChiffon;
-            button9.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button9.Location = new Point(285, 756);
-            button9.Name = "button9";
-            button9.Size = new Size(203, 65);
-            button9.TabIndex = 51;
-            button9.Text = "Рассчитать схожесть монолит";
-            button9.UseVisualStyleBackColor = false;
+            button_MonolithSimilarity.BackColor = Color.LemonChiffon;
+            button_MonolithSimilarity.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_MonolithSimilarity.Location = new Point(285, 756);
+            button_MonolithSimilarity.Name = "button_MonolithSimilarity";
+            button_MonolithSimilarity.Size = new Size(203, 65);
+            button_MonolithSimilarity.TabIndex = 51;
+            button_MonolithSimilarity.Text = "Рассчитать схожесть монолит";
+            button_MonolithSimilarity.UseVisualStyleBackColor = false;
             // 
             // checkBox10
             // 
@@ -701,21 +709,21 @@
             label25.TabIndex = 58;
             label25.Text = "w кол";
             // 
-            // textBox10
+            // weight2TextBoxAnsamble
             // 
-            textBox10.BackColor = Color.LightGreen;
-            textBox10.Location = new Point(1396, 836);
-            textBox10.Name = "textBox10";
-            textBox10.Size = new Size(55, 23);
-            textBox10.TabIndex = 57;
+            weight2TextBoxAnsamble.BackColor = Color.LightGreen;
+            weight2TextBoxAnsamble.Location = new Point(1396, 836);
+            weight2TextBoxAnsamble.Name = "weight2TextBoxAnsamble";
+            weight2TextBoxAnsamble.Size = new Size(55, 23);
+            weight2TextBoxAnsamble.TabIndex = 57;
             // 
-            // textBox11
+            // weight1TextBoxAnsamble
             // 
-            textBox11.BackColor = Color.LightBlue;
-            textBox11.Location = new Point(1269, 837);
-            textBox11.Name = "textBox11";
-            textBox11.Size = new Size(55, 23);
-            textBox11.TabIndex = 56;
+            weight1TextBoxAnsamble.BackColor = Color.LightBlue;
+            weight1TextBoxAnsamble.Location = new Point(1269, 837);
+            weight1TextBoxAnsamble.Name = "weight1TextBoxAnsamble";
+            weight1TextBoxAnsamble.Size = new Size(55, 23);
+            weight1TextBoxAnsamble.TabIndex = 56;
             // 
             // label26
             // 
@@ -728,46 +736,47 @@
             label26.TabIndex = 61;
             label26.Text = "w лин";
             // 
-            // textBox12
+            // weight3TextBoxAnsamble
             // 
-            textBox12.BackColor = Color.LightCoral;
-            textBox12.Location = new Point(1546, 836);
-            textBox12.Name = "textBox12";
-            textBox12.Size = new Size(55, 23);
-            textBox12.TabIndex = 60;
+            weight3TextBoxAnsamble.BackColor = Color.LightCoral;
+            weight3TextBoxAnsamble.Location = new Point(1546, 836);
+            weight3TextBoxAnsamble.Name = "weight3TextBoxAnsamble";
+            weight3TextBoxAnsamble.Size = new Size(55, 23);
+            weight3TextBoxAnsamble.TabIndex = 60;
             // 
-            // button10
+            // button_AnsambleResult
             // 
-            button10.BackColor = Color.MediumSlateBlue;
-            button10.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button10.Location = new Point(1256, 882);
-            button10.Name = "button10";
-            button10.Size = new Size(290, 52);
-            button10.TabIndex = 62;
-            button10.Text = "Рассчитать Ансамбль";
-            button10.UseVisualStyleBackColor = false;
+            button_AnsambleResult.BackColor = Color.MediumSlateBlue;
+            button_AnsambleResult.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_AnsambleResult.Location = new Point(1256, 882);
+            button_AnsambleResult.Name = "button_AnsambleResult";
+            button_AnsambleResult.Size = new Size(290, 52);
+            button_AnsambleResult.TabIndex = 62;
+            button_AnsambleResult.Text = "Рассчитать Ансамбль";
+            button_AnsambleResult.UseVisualStyleBackColor = false;
+            button_AnsambleResult.Click += button_AnsambleResult_Click;
             // 
-            // button11
+            // button_GetBestCoefsForMonolith
             // 
-            button11.BackColor = Color.LemonChiffon;
-            button11.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button11.Location = new Point(20, 740);
-            button11.Name = "button11";
-            button11.Size = new Size(206, 62);
-            button11.TabIndex = 63;
-            button11.Text = "Рассчитать лучшие коэффициенты";
-            button11.UseVisualStyleBackColor = false;
+            button_GetBestCoefsForMonolith.BackColor = Color.LemonChiffon;
+            button_GetBestCoefsForMonolith.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_GetBestCoefsForMonolith.Location = new Point(20, 740);
+            button_GetBestCoefsForMonolith.Name = "button_GetBestCoefsForMonolith";
+            button_GetBestCoefsForMonolith.Size = new Size(206, 62);
+            button_GetBestCoefsForMonolith.TabIndex = 63;
+            button_GetBestCoefsForMonolith.Text = "Рассчитать лучшие коэффициенты";
+            button_GetBestCoefsForMonolith.UseVisualStyleBackColor = false;
             // 
-            // button12
+            // button_GetBestCoefsAnsamble
             // 
-            button12.BackColor = Color.MediumSlateBlue;
-            button12.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            button12.Location = new Point(1200, 761);
-            button12.Name = "button12";
-            button12.Size = new Size(401, 54);
-            button12.TabIndex = 64;
-            button12.Text = "Рассчитать лучшие коэффициенты";
-            button12.UseVisualStyleBackColor = false;
+            button_GetBestCoefsAnsamble.BackColor = Color.MediumSlateBlue;
+            button_GetBestCoefsAnsamble.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            button_GetBestCoefsAnsamble.Location = new Point(1200, 761);
+            button_GetBestCoefsAnsamble.Name = "button_GetBestCoefsAnsamble";
+            button_GetBestCoefsAnsamble.Size = new Size(401, 54);
+            button_GetBestCoefsAnsamble.TabIndex = 64;
+            button_GetBestCoefsAnsamble.Text = "Рассчитать лучшие коэффициенты";
+            button_GetBestCoefsAnsamble.UseVisualStyleBackColor = false;
             // 
             // textBox13
             // 
@@ -782,58 +791,58 @@
             textBox14.BackColor = Color.LightBlue;
             textBox14.Location = new Point(495, 463);
             textBox14.Name = "textBox14";
-            textBox14.Size = new Size(87, 23);
+            textBox14.Size = new Size(70, 23);
             textBox14.TabIndex = 66;
             // 
-            // textBox15
+            // timeTextBox_ContentSimilarity
             // 
-            textBox15.BackColor = Color.LightGreen;
-            textBox15.Location = new Point(272, 552);
-            textBox15.Name = "textBox15";
-            textBox15.Size = new Size(87, 23);
-            textBox15.TabIndex = 67;
+            timeTextBox_ContentSimilarity.BackColor = Color.LightGreen;
+            timeTextBox_ContentSimilarity.Location = new Point(272, 552);
+            timeTextBox_ContentSimilarity.Name = "timeTextBox_ContentSimilarity";
+            timeTextBox_ContentSimilarity.Size = new Size(87, 23);
+            timeTextBox_ContentSimilarity.TabIndex = 67;
             // 
-            // textBox16
+            // timeTextBox_ContentBased
             // 
-            textBox16.BackColor = Color.LightGreen;
-            textBox16.Location = new Point(613, 659);
-            textBox16.Name = "textBox16";
-            textBox16.Size = new Size(87, 23);
-            textBox16.TabIndex = 68;
-            textBox16.TextChanged += textBox16_TextChanged;
+            timeTextBox_ContentBased.BackColor = Color.LightGreen;
+            timeTextBox_ContentBased.Location = new Point(613, 659);
+            timeTextBox_ContentBased.Name = "timeTextBox_ContentBased";
+            timeTextBox_ContentBased.Size = new Size(87, 23);
+            timeTextBox_ContentBased.TabIndex = 68;
+            timeTextBox_ContentBased.TextChanged += textBox16_TextChanged;
             // 
-            // textBox17
+            // timeTextBox_MonolithSimilarity
             // 
-            textBox17.BackColor = Color.LightGoldenrodYellow;
-            textBox17.Location = new Point(541, 787);
-            textBox17.Name = "textBox17";
-            textBox17.Size = new Size(87, 23);
-            textBox17.TabIndex = 69;
-            textBox17.TextChanged += textBox17_TextChanged;
+            timeTextBox_MonolithSimilarity.BackColor = Color.LightGoldenrodYellow;
+            timeTextBox_MonolithSimilarity.Location = new Point(541, 787);
+            timeTextBox_MonolithSimilarity.Name = "timeTextBox_MonolithSimilarity";
+            timeTextBox_MonolithSimilarity.Size = new Size(87, 23);
+            timeTextBox_MonolithSimilarity.TabIndex = 69;
+            timeTextBox_MonolithSimilarity.TextChanged += textBox17_TextChanged;
             // 
-            // textBox18
+            // timeTextBoxMonolithResult
             // 
-            textBox18.BackColor = Color.LightGoldenrodYellow;
-            textBox18.Location = new Point(598, 899);
-            textBox18.Name = "textBox18";
-            textBox18.Size = new Size(87, 23);
-            textBox18.TabIndex = 70;
+            timeTextBoxMonolithResult.BackColor = Color.LightGoldenrodYellow;
+            timeTextBoxMonolithResult.Location = new Point(598, 899);
+            timeTextBoxMonolithResult.Name = "timeTextBoxMonolithResult";
+            timeTextBoxMonolithResult.Size = new Size(87, 23);
+            timeTextBoxMonolithResult.TabIndex = 70;
             // 
-            // textBox19
+            // timeTextBoxLinearRegression
             // 
-            textBox19.BackColor = Color.LightCoral;
-            textBox19.Location = new Point(894, 870);
-            textBox19.Name = "textBox19";
-            textBox19.Size = new Size(87, 23);
-            textBox19.TabIndex = 71;
+            timeTextBoxLinearRegression.BackColor = Color.LightCoral;
+            timeTextBoxLinearRegression.Location = new Point(894, 870);
+            timeTextBoxLinearRegression.Name = "timeTextBoxLinearRegression";
+            timeTextBoxLinearRegression.Size = new Size(87, 23);
+            timeTextBoxLinearRegression.TabIndex = 71;
             // 
-            // textBox20
+            // timeTextBoxAnsamble
             // 
-            textBox20.BackColor = Color.MediumSlateBlue;
-            textBox20.Location = new Point(1595, 911);
-            textBox20.Name = "textBox20";
-            textBox20.Size = new Size(87, 23);
-            textBox20.TabIndex = 72;
+            timeTextBoxAnsamble.BackColor = Color.MediumSlateBlue;
+            timeTextBoxAnsamble.Location = new Point(1595, 911);
+            timeTextBoxAnsamble.Name = "timeTextBoxAnsamble";
+            timeTextBoxAnsamble.Size = new Size(87, 23);
+            timeTextBoxAnsamble.TabIndex = 72;
             // 
             // label27
             // 
@@ -943,11 +952,44 @@
             label36.TabIndex = 82;
             label36.Text = "Предсказанный рейтинг";
             // 
+            // uniform
+            // 
+            uniform.Location = new Point(579, 424);
+            uniform.Name = "uniform";
+            uniform.Size = new Size(244, 23);
+            uniform.TabIndex = 83;
+            uniform.Text = "равномерное распределение";
+            uniform.UseVisualStyleBackColor = true;
+            uniform.Click += uniform_Click;
+            // 
+            // button1
+            // 
+            button1.Location = new Point(579, 463);
+            button1.Name = "button1";
+            button1.Size = new Size(244, 23);
+            button1.TabIndex = 84;
+            button1.Text = "нормальное распределение";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click_1;
+            // 
+            // button4
+            // 
+            button4.Location = new Point(579, 502);
+            button4.Name = "button4";
+            button4.Size = new Size(244, 23);
+            button4.TabIndex = 85;
+            button4.Text = "среднее";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click_1;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1756, 1061);
+            Controls.Add(button4);
+            Controls.Add(button1);
+            Controls.Add(uniform);
             Controls.Add(label36);
             Controls.Add(label35);
             Controls.Add(label34);
@@ -958,41 +1000,41 @@
             Controls.Add(label29);
             Controls.Add(label28);
             Controls.Add(label27);
-            Controls.Add(textBox20);
-            Controls.Add(textBox19);
-            Controls.Add(textBox18);
-            Controls.Add(textBox17);
-            Controls.Add(textBox16);
-            Controls.Add(textBox15);
+            Controls.Add(timeTextBoxAnsamble);
+            Controls.Add(timeTextBoxLinearRegression);
+            Controls.Add(timeTextBoxMonolithResult);
+            Controls.Add(timeTextBox_MonolithSimilarity);
+            Controls.Add(timeTextBox_ContentBased);
+            Controls.Add(timeTextBox_ContentSimilarity);
             Controls.Add(textBox14);
             Controls.Add(textBox13);
-            Controls.Add(button12);
-            Controls.Add(button11);
-            Controls.Add(button10);
+            Controls.Add(button_GetBestCoefsAnsamble);
+            Controls.Add(button_GetBestCoefsForMonolith);
+            Controls.Add(button_AnsambleResult);
             Controls.Add(label26);
-            Controls.Add(textBox12);
+            Controls.Add(weight3TextBoxAnsamble);
             Controls.Add(label24);
             Controls.Add(label25);
-            Controls.Add(textBox10);
-            Controls.Add(textBox11);
+            Controls.Add(weight2TextBoxAnsamble);
+            Controls.Add(weight1TextBoxAnsamble);
             Controls.Add(label23);
             Controls.Add(numericUpDown3);
             Controls.Add(checkBox11);
             Controls.Add(checkBox10);
-            Controls.Add(button9);
+            Controls.Add(button_MonolithSimilarity);
             Controls.Add(label22);
             Controls.Add(label21);
-            Controls.Add(textBox9);
-            Controls.Add(textBox8);
-            Controls.Add(button8);
-            Controls.Add(button7);
+            Controls.Add(weight2TextBoxMonolith);
+            Controls.Add(weight1TextBoxMonolith);
+            Controls.Add(button_MonolithResult);
+            Controls.Add(button_LinearRegressionResult);
             Controls.Add(label20);
             Controls.Add(numericUpDown2);
             Controls.Add(checkBox9);
-            Controls.Add(button6);
+            Controls.Add(button_ContentBasedResult);
             Controls.Add(checkBox8);
-            Controls.Add(button5);
-            Controls.Add(checkBox7);
+            Controls.Add(button_ContentSimilarityMatrix);
+            Controls.Add(checkBox_UseTrainDataAsTest);
             Controls.Add(label19);
             Controls.Add(textBox7);
             Controls.Add(label18);
@@ -1016,7 +1058,7 @@
             Controls.Add(checkBox6);
             Controls.Add(checkBox5);
             Controls.Add(checkBox4);
-            Controls.Add(button4);
+            Controls.Add(button_CollaborativeSimilarity);
             Controls.Add(label4);
             Controls.Add(checkBox3);
             Controls.Add(checkBox2);
@@ -1029,7 +1071,7 @@
             Controls.Add(label1);
             Controls.Add(textBox2);
             Controls.Add(textBox1);
-            Controls.Add(button1);
+            Controls.Add(button_CollaborativeResult);
             Name = "Form1";
             Text = "Form1";
             Load += Form1_Load;
@@ -1042,7 +1084,7 @@
 
         #endregion
 
-        private Button button1;
+        private Button button_CollaborativeResult;
         private TextBox textBox1;
         private TextBox textBox2;
         private Label label1;
@@ -1055,7 +1097,7 @@
         private CheckBox checkBox2;
         private CheckBox checkBox3;
         private Label label4;
-        private Button button4;
+        private Button button_CollaborativeSimilarity;
         private CheckBox checkBox4;
         private CheckBox checkBox5;
         private CheckBox checkBox6;
@@ -1081,41 +1123,41 @@
         private TextBox textBox6;
         private Label label19;
         private TextBox textBox7;
-        private CheckBox checkBox7;
-        private Button button5;
+        private CheckBox checkBox_UseTrainDataAsTest;
+        private Button button_ContentSimilarityMatrix;
         private CheckBox checkBox8;
         private Label label20;
         private NumericUpDown numericUpDown2;
         private CheckBox checkBox9;
-        private Button button6;
-        private Button button7;
-        private Button button8;
-        private TextBox textBox8;
-        private TextBox textBox9;
+        private Button button_ContentBasedResult;
+        private Button button_LinearRegressionResult;
+        private Button button_MonolithResult;
+        private TextBox weight1TextBoxMonolith;
+        private TextBox weight2TextBoxMonolith;
         private Label label21;
         private Label label22;
-        private Button button9;
+        private Button button_MonolithSimilarity;
         private CheckBox checkBox10;
         private Label label23;
         private NumericUpDown numericUpDown3;
         private CheckBox checkBox11;
         private Label label24;
         private Label label25;
-        private TextBox textBox10;
-        private TextBox textBox11;
+        private TextBox weight2TextBoxAnsamble;
+        private TextBox weight1TextBoxAnsamble;
         private Label label26;
-        private TextBox textBox12;
-        private Button button10;
-        private Button button11;
-        private Button button12;
+        private TextBox weight3TextBoxAnsamble;
+        private Button button_AnsambleResult;
+        private Button button_GetBestCoefsForMonolith;
+        private Button button_GetBestCoefsAnsamble;
         private TextBox textBox13;
         private TextBox textBox14;
-        private TextBox textBox15;
-        private TextBox textBox16;
-        private TextBox textBox17;
-        private TextBox textBox18;
-        private TextBox textBox19;
-        private TextBox textBox20;
+        private TextBox timeTextBox_ContentSimilarity;
+        private TextBox timeTextBox_ContentBased;
+        private TextBox timeTextBox_MonolithSimilarity;
+        private TextBox timeTextBoxMonolithResult;
+        private TextBox timeTextBoxLinearRegression;
+        private TextBox timeTextBoxAnsamble;
         private Label label27;
         private Label label28;
         private Label label29;
@@ -1126,5 +1168,8 @@
         private Label label34;
         private Label label35;
         private Label label36;
+        private Button uniform;
+        private Button button1;
+        private Button button4;
     }
 }

@@ -240,14 +240,14 @@ namespace RecommenderSystem
             sr.Close();
         }
         //max stable k = 20
-        public List<(int, double, double)> GetTopKItems(int k, int user, int item)
+        public List<(int, double, double)> GetTopKItems(int k, int user, int item, List<List<double>> itemItemMatrix)
         {
             //List<double> result = new List<double>();
             List<(int, double, double)> userItemsWithRatings = new List<(int, double, double)>();
 
             for (int i = 0; i < _itemUserMatrixByRow[user].Count; i++)
             {
-                userItemsWithRatings.Add((_itemUserMatrixByRow[user][i].Item1, _itemItemMatrix[item][_itemUserMatrixByRow[user][i].Item1], _itemUserMatrixByRow[user][i].Item2)); 
+                userItemsWithRatings.Add((_itemUserMatrixByRow[user][i].Item1, itemItemMatrix[item][_itemUserMatrixByRow[user][i].Item1], _itemUserMatrixByRow[user][i].Item2)); 
             }
             //
             userItemsWithRatings.Sort((a, b) => b.Item2.CompareTo(a.Item2));
@@ -271,11 +271,11 @@ namespace RecommenderSystem
         }
 
         // max stable k = 19
-        public double GetPredictedRatingFromUserToItem(int user, int item, int k, bool useNormalization) 
+        public double GetPredictedRatingFromUserToItem(int user, int item, int k, bool useNormalization, List<List<double>> itemItemMatrix) 
         {
             int convertedUser = user;
             int convertedItem = item;
-            List<(int, double, double)> userItemsWithRatings = GetTopKItems(k + 1, convertedUser, convertedItem);
+            List<(int, double, double)> userItemsWithRatings = GetTopKItems(k + 1, convertedUser, convertedItem, itemItemMatrix);
             double weightsMultRatingSum = 0;
             double weightsAbsoluteSum = 0;
             double userMean = GetUserMean(convertedUser);
@@ -356,12 +356,34 @@ namespace RecommenderSystem
             sw.Close ();
         }
 
-        private List<double> GetPredictedRatings (List<(int, int)> testValues, int k, bool useNormalization)
+        private List<double> GetPredictedRatings (List<(int, int)> testValues, int k, bool useNormalization, RecommendationTypes type)
         {
+            List<List<double>> itemItemMatrix;
+            switch(type)
+            {
+                case RecommendationTypes.CollaborativeFiltering:
+                    {
+                        itemItemMatrix = _itemItemMatrix; break;
+                    }
+                case RecommendationTypes.ContentBasedFiltering:
+                    {
+                        itemItemMatrix = _itemItemMatrixContent; break;
+                    }
+                case RecommendationTypes.MonolithHybrid:
+                    {
+                        itemItemMatrix = _itemItemMatrixMixed; break;
+                    }
+                default:
+                    {
+                        throw new NotImplementedException();
+                    }
+
+            }
+
             List<double> result = new List<double>();
             foreach (var val in testValues)
             {
-                result.Add(GetPredictedRatingFromUserToItem(val.Item1, val.Item2, k, useNormalization));
+                result.Add(GetPredictedRatingFromUserToItem(val.Item1, val.Item2, k, useNormalization, itemItemMatrix));
             }
             return result;
         }
@@ -376,15 +398,51 @@ namespace RecommenderSystem
             return result;
         }
 
-        public (double[,], double, double, double, int, double, double, double) ProcessTest(List<(int, int, double)> testValues, int k, bool useNormalization)
+        public (double[,], double, double, double, int, double, double, double) ProcessTest(List<(int, int, double)> testValues, int k, bool useNormalization, RecommendationTypes type)
         {
             List<(int, int)> userMovieList = testValues
                 .Select(x => (x.Item1, x.Item2)).ToList();
-            List<double> predictedRatings = GetPredictedRatings(userMovieList, k, useNormalization);
+            List<double> predictedRatings;
             //List<double> predictedRatings = GetPredictedRatingsLinearRegression(userMovieList);
             //List<double> predictedRatings = GetRandomRatings(testValues.Count);
             //List<double> predictedRatings = GetRandomRatingsNormal(testValues.Count);
             //List<double> predictedRatings = GetRatingsNum(testValues.Count, 3.58);
+
+            switch (type)
+            {
+                case RecommendationTypes.CollaborativeFiltering:
+                case RecommendationTypes.ContentBasedFiltering:
+                case RecommendationTypes.MonolithHybrid:
+                    {
+                        predictedRatings = GetPredictedRatings(userMovieList, k, useNormalization, type); break;
+                    }
+                case RecommendationTypes.LinearRegression:
+                    {
+                        predictedRatings = GetPredictedRatingsLinearRegression(userMovieList); break;
+                    }
+                case RecommendationTypes.UniformRandom:
+                    {
+                        predictedRatings = GetRandomRatingsUniform(testValues.Count); break;
+                    }
+                case RecommendationTypes.NormalRandom:
+                    {
+                        predictedRatings = GetRandomRatingsNormal(testValues.Count); break;
+                    }
+                case RecommendationTypes.Num:
+                    {
+                        predictedRatings = GetRatingsNum(testValues.Count, 3.58); break;
+                    }
+                //case 7:
+                //    {
+                //        //predictedRatings = GetRatingsAnsamble(); 
+                //        break;
+                //    }
+                default:
+                    {
+                        throw new NotImplementedException();
+                    }
+
+            }
 
             List <(double, double)> predictedActualRatings = predictedRatings.Zip(testValues, (first, second) => (first, second.Item3))
                 .Where(pair => pair.Item1 != -100).ToList();
