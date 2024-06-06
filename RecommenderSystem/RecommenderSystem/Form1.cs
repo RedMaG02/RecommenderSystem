@@ -2,6 +2,8 @@ using Microsoft.VisualBasic.ApplicationServices;
 using MyMediaLite.Eval;
 using MyMediaLite.IO;
 using MyMediaLite.RatingPrediction;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Reflection.Emit;
@@ -15,6 +17,7 @@ namespace RecommenderSystem
         private string trainDataPath;
         private string movieDataPath;
         private string testDataPath;
+        List<PictureBox> pbs = new List<PictureBox>();
         RecommenderSystem rs;
         public Form1()
         {
@@ -41,36 +44,46 @@ namespace RecommenderSystem
 
         private void ProcessRating(RecommendationTypes type, int k = 1, bool useNormalisation = false)
         {
-            (double[,] data, double mae, double rmse, double r, int count, double accuracy, double precision, double recall) = rs.ProcessTest(rs._testData, k, useNormalisation, type);
+
+            double[,] data; double mae; double rmse; double r; int count; double accuracy; double precision; double recall;
+
+            if (type == RecommendationTypes.AnsembleHybrid)
+            {
+                (data, mae, rmse, r, count,accuracy, precision, recall) = rs.ProcessTestAnsamble(rs._testData, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked, Convert.ToInt32(numericUpDown2.Value), checkBox9.Checked, Convert.ToDouble(weight1TextBoxAnsamble.Text), Convert.ToDouble(weight2TextBoxAnsamble.Text), Convert.ToDouble(weight3TextBoxAnsamble.Text));
+            }
+            else
+            {
+                (data, mae, rmse, r, count, accuracy, precision, recall) = rs.ProcessTest(rs._testData, k, useNormalisation, type);
+            }
 
 
-            textBox1.Text = Convert.ToString(mae);
-            textBox2.Text = Convert.ToString(rmse);
-            textBox3.Text = Convert.ToString(r);
+
+            textBox1.Text = Convert.ToString(Math.Round(mae,3));
+            textBox2.Text = Convert.ToString(Math.Round(rmse,3));
+            textBox3.Text = Convert.ToString(Math.Round(r,3));
             textBox4.Text = Convert.ToString(count);
-            textBox5.Text = Convert.ToString(accuracy);
-            textBox6.Text = Convert.ToString(precision);
-            textBox7.Text = Convert.ToString(recall);
+            textBox5.Text = Convert.ToString(Math.Round(accuracy,3));
+            textBox6.Text = Convert.ToString(Math.Round(precision,3));
+            textBox7.Text = Convert.ToString(Math.Round(recall,3));
 
             CreateChart(data, (1000, 500));
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             ProcessRating(RecommendationTypes.CollaborativeFiltering, Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked);
+            sw.Stop();
+            //rs.GetChartOutData(rs._testData, checkBox1.Checked, RecommendationTypes.CollaborativeFiltering, "Collaboration.txt");
+            textBox14.Text = sw.ElapsedMilliseconds.ToString();
         }
 
         private void CreateChart(double[,] data, (int, int) position)
         {
 
-
-            foreach (Control control in this.Controls)
+            foreach(var picturebox in pbs)
             {
-                if (control is PictureBox)
-                {
-                    this.Controls.Remove(control);
-                    control.Dispose();
-                }
+                picturebox.Dispose();
             }
 
             int size = 100;
@@ -162,6 +175,7 @@ namespace RecommenderSystem
 
                     }
                     pb.Image = image;
+                    pbs.Add(pb);
                     this.Controls.Add(pb);
 
                 }
@@ -244,11 +258,16 @@ namespace RecommenderSystem
                     rs.CreateItemUserMatrixes(trainDataPath, false);
                     rs.GetTestData(trainDataPath);
                 }
+                else
+                {
+                    rs.CreateItemUserMatrixes(trainDataPath);
+                }
             }
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             if (checkBox2.Checked)
             {
                 rs.CteateItemItemSimilarityMatrix();
@@ -257,6 +276,8 @@ namespace RecommenderSystem
             {
                 rs.CteateItemItemSimilarityMatrixAC();
             }
+            sw.Stop();
+            textBox13.Text = sw.ElapsedMilliseconds.ToString();
 
             //rs.CteateItemItemSimilarityMatrixGenresBasedV2();
             checkBox6.Checked = true;
@@ -301,7 +322,10 @@ namespace RecommenderSystem
 
         private void button7_Click(object sender, EventArgs e)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             ProcessRating(RecommendationTypes.LinearRegression);
+            sw.Stop();
+            timeTextBoxLinearRegression.Text = sw.ElapsedMilliseconds.ToString();
         }
 
         private void textBox16_TextChanged(object sender, EventArgs e)
@@ -316,7 +340,18 @@ namespace RecommenderSystem
 
         private void checkBox_UseTrainDataAsTest_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (trainDataPath != null)
+            {
+                if (checkBox_UseTrainDataAsTest.Checked)
+                {
+                    rs.CreateItemUserMatrixes(trainDataPath, false);
+                    rs.GetTestData(trainDataPath);
+                }
+                else
+                {
+                    rs.CreateItemUserMatrixes(trainDataPath);
+                }
+            }
         }
 
         private void button_ContentSimilarityMatrix_Click(object sender, EventArgs e)
@@ -337,7 +372,11 @@ namespace RecommenderSystem
 
         private void button_ContentBasedResult_Click(object sender, EventArgs e)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             ProcessRating(RecommendationTypes.ContentBasedFiltering, Convert.ToInt32(numericUpDown2.Value), checkBox9.Checked);
+            sw.Stop();
+            //rs.GetChartOutData(rs._testData, checkBox9.Checked, RecommendationTypes.ContentBasedFiltering, "ContentBased.txt");
+            timeTextBox_ContentBased.Text = sw.ElapsedMilliseconds.ToString();
         }
 
         private void numericUpDown2_ValueChanged(object sender, EventArgs e)
@@ -347,12 +386,19 @@ namespace RecommenderSystem
 
         private void button_MonolithResult_Click(object sender, EventArgs e)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             ProcessRating(RecommendationTypes.MonolithHybrid, Convert.ToInt32(numericUpDown3.Value), checkBox11.Checked);
+            sw.Stop();
+            //rs.GetChartOutData(rs._testData, checkBox11.Checked, RecommendationTypes.MonolithHybrid, "Monolyth.txt");
+            timeTextBoxMonolithResult.Text = sw.ElapsedMilliseconds.ToString();
         }
 
         private void button_AnsambleResult_Click(object sender, EventArgs e)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             ProcessRating(RecommendationTypes.AnsembleHybrid);
+            sw.Stop();
+            timeTextBoxAnsamble.Text = sw.ElapsedMilliseconds.ToString();
         }
 
         private void uniform_Click(object sender, EventArgs e)
@@ -368,6 +414,29 @@ namespace RecommenderSystem
         private void button4_Click_1(object sender, EventArgs e)
         {
             ProcessRating(RecommendationTypes.Num);
+        }
+
+        private void button_MonolithSimilarity_Click(object sender, EventArgs e)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            rs.MonolithMixer(double.Parse(weight1TextBoxMonolith.Text), double.Parse(weight2TextBoxMonolith.Text));
+            sw.Stop();
+            timeTextBox_MonolithSimilarity.Text = sw.ElapsedMilliseconds.ToString();
+        }
+
+        private void button_GetBestCoefsForMonolith_Click(object sender, EventArgs e)
+        {
+            (double w1, double w2) = rs.GetBestKoefsMonolith(Convert.ToInt32(numericUpDown3.Value), checkBox11.Checked);
+            weight1TextBoxMonolith.Text = w1.ToString();
+            weight2TextBoxMonolith.Text = w2.ToString();
+        }
+
+        private void button_GetBestCoefsAnsamble_Click(object sender, EventArgs e)
+        {
+            (double w1, double w2, double w3) = rs.GetBestKoefsAnsamble(Convert.ToInt32(numericUpDown1.Value), checkBox1.Checked, Convert.ToInt32(numericUpDown2.Value), checkBox9.Checked);
+            weight1TextBoxAnsamble.Text = w1.ToString();
+            weight2TextBoxAnsamble.Text = w2.ToString();
+            weight3TextBoxAnsamble.Text = w3.ToString();
         }
     }
 }

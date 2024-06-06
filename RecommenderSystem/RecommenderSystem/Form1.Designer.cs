@@ -134,23 +134,23 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(579, 44);
+            textBox1.Location = new Point(494, 42);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(244, 23);
+            textBox1.Size = new Size(411, 23);
             textBox1.TabIndex = 1;
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(579, 95);
+            textBox2.Location = new Point(494, 90);
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(244, 23);
+            textBox2.Size = new Size(411, 23);
             textBox2.TabIndex = 2;
             // 
             // label1
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label1.Location = new Point(579, 17);
+            label1.Location = new Point(494, 20);
             label1.Name = "label1";
             label1.Size = new Size(313, 19);
             label1.TabIndex = 3;
@@ -161,11 +161,11 @@
             // 
             label2.AutoSize = true;
             label2.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label2.Location = new Point(579, 70);
+            label2.Location = new Point(494, 68);
             label2.Name = "label2";
-            label2.Size = new Size(326, 19);
+            label2.Size = new Size(411, 19);
             label2.TabIndex = 4;
-            label2.Text = "Среднеквадратичная ошибка (RMSE)";
+            label2.Text = "Корень из среднеквадратичной ошибки (RMSE)";
             label2.Click += label2_Click;
             // 
             // button2
@@ -413,7 +413,7 @@
             // 
             label15.AutoSize = true;
             label15.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label15.Location = new Point(579, 122);
+            label15.Location = new Point(494, 123);
             label15.Name = "label15";
             label15.Size = new Size(306, 19);
             label15.TabIndex = 29;
@@ -421,16 +421,16 @@
             // 
             // textBox3
             // 
-            textBox3.Location = new Point(579, 147);
+            textBox3.Location = new Point(494, 145);
             textBox3.Name = "textBox3";
-            textBox3.Size = new Size(244, 23);
+            textBox3.Size = new Size(411, 23);
             textBox3.TabIndex = 28;
             // 
             // label16
             // 
             label16.AutoSize = true;
             label16.Font = new Font("Tahoma", 12F, FontStyle.Bold, GraphicsUnit.Point);
-            label16.Location = new Point(579, 173);
+            label16.Location = new Point(494, 171);
             label16.Name = "label16";
             label16.Size = new Size(107, 19);
             label16.TabIndex = 31;
@@ -438,9 +438,9 @@
             // 
             // textBox4
             // 
-            textBox4.Location = new Point(579, 198);
+            textBox4.Location = new Point(494, 193);
             textBox4.Name = "textBox4";
-            textBox4.Size = new Size(244, 23);
+            textBox4.Size = new Size(411, 23);
             textBox4.TabIndex = 30;
             // 
             // label17
@@ -645,6 +645,7 @@
             button_MonolithSimilarity.TabIndex = 51;
             button_MonolithSimilarity.Text = "Рассчитать схожесть монолит";
             button_MonolithSimilarity.UseVisualStyleBackColor = false;
+            button_MonolithSimilarity.Click += button_MonolithSimilarity_Click;
             // 
             // checkBox10
             // 
@@ -766,6 +767,7 @@
             button_GetBestCoefsForMonolith.TabIndex = 63;
             button_GetBestCoefsForMonolith.Text = "Рассчитать лучшие коэффициенты";
             button_GetBestCoefsForMonolith.UseVisualStyleBackColor = false;
+            button_GetBestCoefsForMonolith.Click += button_GetBestCoefsForMonolith_Click;
             // 
             // button_GetBestCoefsAnsamble
             // 
@@ -777,6 +779,7 @@
             button_GetBestCoefsAnsamble.TabIndex = 64;
             button_GetBestCoefsAnsamble.Text = "Рассчитать лучшие коэффициенты";
             button_GetBestCoefsAnsamble.UseVisualStyleBackColor = false;
+            button_GetBestCoefsAnsamble.Click += button_GetBestCoefsAnsamble_Click;
             // 
             // textBox13
             // 

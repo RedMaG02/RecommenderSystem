@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Security.Policy;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Complex;
 using MathNet.Numerics.LinearAlgebra.Double;
+
 
 namespace RecommenderSystem
 {
@@ -143,6 +145,7 @@ namespace RecommenderSystem
         public void CreateItemUserColumnMatrix(string dataPath, HashSet<int> excludeItems)
         {
             StreamReader sr = new StreamReader(dataPath);
+            _itemUserMatrixByColumn = new();
             string line;
             int count = 0;
             while ((line = sr.ReadLine()) != null && count != 100000)
@@ -186,6 +189,7 @@ namespace RecommenderSystem
         {
             StreamReader sr = new StreamReader(dataPath);
             _testData = new();
+            _itemUserMatrixByRow = new();
             string line;
             int count = 0;
             while ((line = sr.ReadLine()) != null && count != 100000)
@@ -388,7 +392,78 @@ namespace RecommenderSystem
             return result;
         }
 
-        private List<double> GetPredictedRatingsLinearRegression(List<(int, int)> testValues)
+        public void GetChartOutData(List<(int, int, double)> testValues, bool useNormalization, RecommendationTypes type, string outPath)
+        {
+            List<(int, double, double, double, double, double, double)> values = new List<(int, double, double, double, double, double, double)>();
+            for (int k = 1; k< 101; k++)
+            {
+                (_, double mae, double rmse, double r, _, double accuracy, double precision, double recall) = ProcessTest(testValues, k, useNormalization, type);
+                values.Add((k, mae, rmse, r, accuracy, precision, recall));
+            }
+
+            StreamWriter sw = new StreamWriter(outPath);
+            sw.WriteLine("k:mae:rmse:r:accuracy:precision:recall");
+            foreach (var val in values)
+            {
+                sw.WriteLine($"{val.Item1}:{val.Item2}:{val.Item3}:{val.Item4}:{val.Item5}:{val.Item6}:{val.Item7}");
+            }
+            sw.Close();
+        }
+
+        private List<double> GetPredictedRatingsAnsamble(List<(int, int)> testValues, int kCol, bool useNormalizationCol, int kCon, bool useNormalizationCon, double w1, double w2, double w3)
+        {
+            List<double> result = new List<double>();
+            double rCol, rCon, rLin;
+            foreach (var val in testValues)
+            {
+                rCol = GetPredictedRatingFromUserToItem(val.Item1, val.Item2, kCol, useNormalizationCol, _itemItemMatrix);
+                rCon = GetPredictedRatingFromUserToItem(val.Item1, val.Item2, kCon, useNormalizationCon, _itemItemMatrixContent);
+                rLin = GetPredictedRatingLinearRegression(val.Item1, val.Item2);
+                //if (rCol == -100 || rCon == -100 || rLin == -100)
+                //{
+                //    result.Add(-100);
+                //}
+                //else
+                //{
+                //    result.Add(w1 * rCol + w2 * rCon + w3 * rLin);
+                //}
+                if (rCol == -100)
+                {
+                    rCol = 3.58;
+                }
+                if (rCon ==-100)
+                {
+                    rCon = 3.58;
+                }
+
+                result.Add(w1 * rCol + w2 * rCon + w3 * rLin);
+
+
+                //MessageBox.Show($"w1 = {w1} , w2 ={w2} , w3 = {w3}  rCon = {rCon} rCol = {rCol} rLin = {rLin}   sum = {w1 * rCol + w2 * rCon + w3 * rLin}");
+            }
+            return result;
+        }
+
+        public (double[,], double, double, double, int, double, double, double) ProcessTestAnsamble(List<(int, int, double)> testValues, int kCol, bool useNormalizationCol, int kCon, bool useNormalizationCon, double w1, double w2, double w3)
+        {
+            List<(int, int)> userMovieList = testValues
+                .Select(x => (x.Item1, x.Item2)).ToList();
+
+            List<double> predictedRatings = GetPredictedRatingsAnsamble(userMovieList, kCol,useNormalizationCol,  kCon,useNormalizationCon,  w1,  w2, w3);
+
+            List<(double, double)> predictedActualRatings = predictedRatings.Zip(testValues, (first, second) => (first, second.Item3))
+                .Where(pair => pair.Item1 != -100).ToList();
+
+            double mae = MAE(predictedActualRatings);
+            double rmse = RMSE(predictedActualRatings);
+            double r = DeterminationKoef(predictedActualRatings);
+            double[,] data = GetDataForChart(predictedActualRatings);
+            (double accuracy, double precision, double recall) = GetKategorial(predictedActualRatings);
+
+            return (data, mae, rmse, r, predictedActualRatings.Count(), accuracy, precision, recall);
+        }
+
+            private List<double> GetPredictedRatingsLinearRegression(List<(int, int)> testValues)
         {
             List<double> result = new List<double>();
             foreach (var val in testValues)
@@ -407,7 +482,6 @@ namespace RecommenderSystem
             //List<double> predictedRatings = GetRandomRatings(testValues.Count);
             //List<double> predictedRatings = GetRandomRatingsNormal(testValues.Count);
             //List<double> predictedRatings = GetRatingsNum(testValues.Count, 3.58);
-
             switch (type)
             {
                 case RecommendationTypes.CollaborativeFiltering:
@@ -566,7 +640,7 @@ namespace RecommenderSystem
             List<(double, double)> averageActual = testValues.Select(x => (average, x.Item2)).ToList();
             double averageRMSE = RMSE(averageActual);
 
-            return 1 - (rmse / averageRMSE);
+            return 1 - (Math.Pow(rmse,2) / Math.Pow(averageRMSE,2));
         }
 
         public (double, double, double) GetKategorial(List<(double, double)> testValues)
@@ -624,7 +698,7 @@ namespace RecommenderSystem
             _testData = result;
         }
 
-        private void MonolithMixer(double w1, double w2)
+        public void MonolithMixer(double w1, double w2)
         {
             _itemItemMatrixMixed = new();
             for (int i = 0;i < _itemItemMatrix.Count;i++)
@@ -632,6 +706,46 @@ namespace RecommenderSystem
                 var row = _itemItemMatrix[i].Zip(_itemItemMatrixContent[i], (first, second) => w1 * first + w2 * second).ToList();
                 _itemItemMatrixMixed.Add(row);
             }
+        }
+
+        public (double, double) GetBestKoefsMonolith(int k, bool useNormalization)
+        {
+            double step = 0.01;
+            (double, double) result = new();
+            double minRMSE = double.MaxValue;
+
+            for (double i = 0; i <= 1; i += step)
+            {
+                MonolithMixer(i, 1 - i);
+                (_, _, double rmse, _, _, _, _, _) = ProcessTest(_testData, k, useNormalization, RecommendationTypes.MonolithHybrid);
+                if (rmse < minRMSE)
+                {
+                    result = (i, 1 - i);
+                    minRMSE = rmse;
+                }
+            }
+            return result;
+        }
+
+        public (double, double, double) GetBestKoefsAnsamble(int kCol, bool useNormalizationCol, int kCon, bool useNormalizationCon)
+        {
+            double step = 0.04;
+            (double, double, double) result = new();
+            double minRMSE = double.MaxValue;
+
+            for (double i = 0; i <= 1; i += step)
+            {
+                for (double j = 0; j<= 1-i; j += step)
+                {
+                    (_, _, double rmse, _, _, _, _, _) = ProcessTestAnsamble(_testData, kCol, useNormalizationCol, kCon, useNormalizationCon, i, j, 1 - i - j);
+                    if (rmse < minRMSE)
+                    {
+                        minRMSE = rmse;
+                        result = (i, j, 1 - i - j);
+                    }
+                }
+            }
+            return result;
         }
 
         private double AnsambleMixer(List<double> ratings, List<double> weights)
